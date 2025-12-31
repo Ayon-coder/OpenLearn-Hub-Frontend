@@ -1,0 +1,65 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+.vite/
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.development
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Testing
+coverage/
+.nyc_output/
+
+# Vercel
+.vercel
+
+# Temporary files
+*.tmp
+.cache/
+.temp/
+
+# Editor directories and files
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# TypeScript
+*.tsbuildinfo
+
+# Misc
+.antigravityignore
+.agent/
+
+# Nested backend (should be in separate repo)
+backend/
+dashboards/
+MODULARIZATION_SUMMARY.md
+SUBSCRIPTIONS_FEATURE_SUMMARY.md
+metadata.json
