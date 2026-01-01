@@ -61,7 +61,11 @@ const App: React.FC = () => {
               <Route path="/hub/subject/:subjectId/topic/:topicId" element={<SubtopicExplorer />} />
               <Route path="/hub/subject/:subjectId/topic/:topicId/subtopic/:subtopicId" element={<ContentDetail />} />
 
-              <Route path="/ai-assistant" element={<AIAssistantPage />} />
+              <Route path="/ai-assistant" element={
+                <PrivateRoute>
+                  <AIAssistantPage />
+                </PrivateRoute>
+              } />
 
               <Route path="/my-drive" element={<DrivePage />} />
 

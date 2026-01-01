@@ -236,7 +236,8 @@ export const Dashboard: React.FC = () => {
         title="AI Assistant"
         description="Chat & Concept Mirror"
         onClick={() => navigate('/ai-assistant')}
-        enabled={true}
+        enabled={!!user}
+        lockReason="Sign in required"
         color="sky"
       />
       <ActionCard
@@ -291,8 +292,8 @@ export const Dashboard: React.FC = () => {
               <button
                 onClick={() => canUpload ? navigate('/notes/upload') : null}
                 className={`group flex items-center gap-3 px-6 py-4 rounded-2xl transition-all duration-300 shadow-lg ${canUpload
-                    ? 'bg-white text-gray-900 hover:scale-105 hover:shadow-xl hover:shadow-white/20 cursor-pointer'
-                    : 'bg-white/10 text-gray-400 border border-white/10 cursor-not-allowed hover:bg-white/15'
+                  ? 'bg-white text-gray-900 hover:scale-105 hover:shadow-xl hover:shadow-white/20 cursor-pointer'
+                  : 'bg-white/10 text-gray-400 border border-white/10 cursor-not-allowed hover:bg-white/15'
                   }`}
               >
                 <div className={`p-2 rounded-xl ${canUpload ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-500'}`}>
