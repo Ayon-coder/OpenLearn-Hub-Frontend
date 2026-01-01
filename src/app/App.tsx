@@ -14,7 +14,7 @@ import { SignUpPage } from '@/pages/auth/SignUpPage';
 import { VerificationPage } from '@/pages/auth/VerificationPage';
 import { TrendingNotesPage } from '@/pages/content/TrendingNotesPage';
 import { ProfilePage } from '@/pages/user/ProfilePage';
-import { AIChatPage } from '@/pages/ai/AIChatPage';
+import { AIAssistantPage } from '@/pages/ai/AIAssistantPage';
 import { QuizCreationPage } from '@/pages/quiz/QuizCreationPage';
 import { NoteUploadPage } from '@/pages/content/NoteUploadPage';
 import { BrowseByPathPage } from '@/pages/hub/BrowseByPathPage';
@@ -61,7 +61,7 @@ const App: React.FC = () => {
               <Route path="/hub/subject/:subjectId/topic/:topicId" element={<SubtopicExplorer />} />
               <Route path="/hub/subject/:subjectId/topic/:topicId/subtopic/:subtopicId" element={<ContentDetail />} />
 
-              <Route path="/ai-assistant" element={<AIChatPage />} />
+              <Route path="/ai-assistant" element={<AIAssistantPage />} />
 
               <Route path="/my-drive" element={<DrivePage />} />
 

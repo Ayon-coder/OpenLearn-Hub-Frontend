@@ -21,7 +21,7 @@ import {
   Youtube
 } from 'lucide-react';
 import { driveSyncService } from '@/services/drive/driveSyncService';
-import { geminiService } from '@/services/ai/geminiService';
+// AI summary uses backend directly
 import { interactionService } from '@/services/content/interactionService';
 import { authService } from '@/services/auth/authService';
 import { subscriptionService } from '@/services/user/subscriptionService';
@@ -73,11 +73,16 @@ export const ContentDetail: React.FC = () => {
   const handleGenerateSummary = async (text: string) => {
     setIsSummarizing(true);
     try {
-      // Re-using classifyNote or similar for quick summary logic
-      const result = await geminiService.classifyNote(text);
-      setAiSummary(result.summary);
+      // Use the AI Assistant backend for summary generation
+      const response = await fetch('http://127.0.0.1:5050/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: `Summarize this content in 2-3 sentences for a student: ${text.substring(0, 1500)}` })
+      });
+      const data = await response.json();
+      setAiSummary(data.response || "Summary generated.");
     } catch (e) {
-      setAiSummary("Unable to generate AI summary at this time. Please try again later.");
+      setAiSummary("Unable to generate AI summary. Make sure the AI backend is running on port 5050.");
     } finally {
       setIsSummarizing(false);
     }
