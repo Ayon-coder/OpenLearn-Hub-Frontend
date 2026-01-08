@@ -84,11 +84,7 @@ npm run dev
 ```
 
 ---
-
-## 🌐 Live Demo
-
-Visit the live application deployed on Vercel:
-[https://your-frontend-url.vercel.app](https://your-frontend-url.vercel.app)
+backend repo link = https://github.com/Ayon-coder/OpenLearn-Hub-Backend.git
 
 <br>
 
