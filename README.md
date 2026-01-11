@@ -224,7 +224,6 @@ This frontend connects to two backend services:
    - Concept Analysis
    - Gemini/Groq integration
 
-See the [Backend README](../backend/README.md) for setup instructions.
 
 ---
 
@@ -261,12 +260,5 @@ vercel
 
 ## 📄 Related Links
 
-- **Backend Repository**: [OpenLearn-Hub Backend](../backend/README.md)
-- **Live Demo**: [Coming Soon]
-
----
-
-<div align="center">
-  <p>Made with ❤️ for OpenLearn Hub</p>
-  <p>© 2025 OpenLearn Hub. All rights reserved.</p>
-</div>
+- **Backend Repository**: https://github.com/Ayon-coder/OpenLearn-Hub-Backend.git
+- **Live Demo**: https://openlearn-hub-v8.vercel.app
