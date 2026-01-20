@@ -479,7 +479,8 @@ export const CurriculumResultPage: React.FC = () => {
         };
 
         fetchCurriculum();
-    }, [id, currentUser, navigate]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [id, currentUser?.id, navigate]);
 
     if (isLoading) {
         return (
