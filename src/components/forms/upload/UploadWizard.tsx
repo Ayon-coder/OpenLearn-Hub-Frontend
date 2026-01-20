@@ -318,37 +318,8 @@ export const UploadWizard: React.FC<UploadWizardProps> = ({ onClose, onComplete,
       quiz: selection.attachedQuiz
     });
 
-    // Add to Trending page (DEMO_CONTENTS)
-    addDemoContent({
-      id: contentId,
-      title: selection.title,
-      description,
-      organization: {
-        primaryPath: 'subject',
-        subjectPath: {
-          subject: subject.name,
-          coreTopic: topic.title,
-          subtopic: subtopic.title,
-          resourceTitle: selection.title
-        },
-        // Add channel path if YouTube source is provided
-        ...(selection.sourceMetadata?.youtubeSource?.channelName && {
-          channelPath: {
-            channelName: selection.sourceMetadata.youtubeSource.channelName,
-            playlistName: 'Community Upload',
-            topic: topic.title,
-            resourceTitle: selection.title
-          }
-        })
-      },
-      uploadedBy: user?.name || 'Anonymous',
-      uploadedAt: new Date().toISOString(),
-      views: 0,
-      likes: 0,
-      downloads: 0,
-      videoUrl,
-      coverImage: selection.attachedImage || undefined  // Use attached image as cover if no video
-    });
+    // Removed legacy addDemoContent call to prevent duplicates
+    // addDemoContent({ ... });
 
     onComplete(selection);
   };
