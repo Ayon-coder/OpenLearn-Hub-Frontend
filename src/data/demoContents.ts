@@ -16,45 +16,26 @@ export interface DemoContent {
     level?: 'Beginner' | 'Intermediate' | 'Advanced'; // Added level matching
 }
 
-const STORAGE_KEY = 'openlearn_demo_contents_v5';
+const STORAGE_KEY = 'openlearn_demo_contents_v6';
 
 export const addDemoContent = (content: DemoContent) => {
     console.log('Adding new demo content:', content.title);
+
+    // Add to in-memory list
     DEMO_CONTENTS.unshift(content);
 
-    // Create a storage-safe copy (strip large base64 images)
-    const secureContent = { ...content };
-    if (secureContent.coverImage && secureContent.coverImage.startsWith('data:image') && secureContent.coverImage.length > 1024) {
-        // Replace large base64 with a placeholder or just remove it
-        secureContent.coverImage = undefined; // Or use a default URL if available
-        console.warn('Large base64 image stripped from localStorage to save space');
-    }
-
     try {
-        // We need to fetch the *current* stored list (which might have stripped images) 
-        // and add our new stripped item to it. 
-        // BUT `DEMO_CONTENTS` in memory has the FULL images (Sanitized check? No, DEMO_CONTENTS has everything).
-        // If we save `DEMO_CONTENTS` directly, we verify the InMemory array doesn't have the bloat?
-        // Actually, `DEMO_CONTENTS` is the in-memory state. If we want thumbnails in the UI, we keep them in memory.
-        // But for persistence, we should save a sanitized list.
-
-        // Let's optimize: map the entire DEMO_CONTENTS to a "safe" version for storage
-        const storageSafeContents = DEMO_CONTENTS.map(item => {
-            if (item.coverImage && item.coverImage.startsWith('data:image') && item.coverImage.length > 5000) {
-                return { ...item, coverImage: undefined };
-            }
-            return item;
-        });
-
-        const serialized = JSON.stringify(storageSafeContents);
+        // Save to localStorage
+        // We use a simple strategy: try to save everything. 
+        // If it fails (quota), we might need to handle it, but for now we follow "normal localstorage" request.
+        // To be safe against quota limits with images, we'll just guard the JSON stringify.
+        const serialized = JSON.stringify(DEMO_CONTENTS);
         localStorage.setItem(STORAGE_KEY, serialized);
-        console.log(`Saved ${DEMO_CONTENTS.length} items to localStorage (${serialized.length} bytes)`);
+        console.log(`Saved ${DEMO_CONTENTS.length} items to localStorage`);
     } catch (e) {
         console.error('Failed to save to localStorage', e);
-        // If quota exceeded, try to clear some space or alert (simulated)
         if (e instanceof DOMException && e.name === 'QuotaExceededError') {
-            console.warn('Storage quota exceeded! Attempting to cleanup...');
-            // Could implement cleanup here, e.g. remove oldest items
+            alert('Storage full! Could not save the new note locally.');
         }
     }
 };
