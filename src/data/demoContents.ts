@@ -16,87 +16,25 @@ export interface DemoContent {
     level?: 'Beginner' | 'Intermediate' | 'Advanced'; // Added level matching
 }
 
-const STORAGE_KEY = 'openlearn_demo_contents_v6';
+
+// --- REVERTING TO STATIC DATA ONLY AS PER USER REQUEST ---
+// We have removed all localStorage logic to prevent white-screen crashes on mobile devices
+// caused by corrupt or quota-exceeded storage.
 
 export const addDemoContent = (content: DemoContent) => {
-    console.log('Adding new demo content:', content.title);
-
-    // Add to in-memory list
+    console.log('Adding new demo content to in-memory session (not persistent):', content.title);
+    // Add to in-memory list only for current session
     DEMO_CONTENTS.unshift(content);
-
-    try {
-        // Save to localStorage
-        // We use a simple strategy: try to save everything. 
-        // If it fails (quota), we might need to handle it, but for now we follow "normal localstorage" request.
-        // To be safe against quota limits with images, we'll just guard the JSON stringify.
-        const serialized = JSON.stringify(DEMO_CONTENTS);
-        localStorage.setItem(STORAGE_KEY, serialized);
-        console.log(`Saved ${DEMO_CONTENTS.length} items to localStorage`);
-    } catch (e) {
-        console.error('Failed to save to localStorage', e);
-        if (e instanceof DOMException && e.name === 'QuotaExceededError') {
-            alert('Storage full! Could not save the new note locally.');
-        }
-    }
 };
 
-// Refresh DEMO_CONTENTS from localStorage (for cross-tab or page refresh scenarios)
+// No-op for refresh since we don't store anything
 export const refreshContents = (): DemoContent[] => {
-    try {
-        if (typeof window === 'undefined') return DEMO_CONTENTS;
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-            const parsed = JSON.parse(saved);
-            if (Array.isArray(parsed) && parsed.length > 0) {
-                // Update the DEMO_CONTENTS array in-place only if we have valid data
-                DEMO_CONTENTS.length = 0;
-                // Filter out any invalid items (missing organization, etc.)
-                const validItems = parsed.filter(item => item && item.organization);
-
-                if (validItems.length > 0) {
-                    DEMO_CONTENTS.length = 0;
-                    DEMO_CONTENTS.push(...validItems);
-                } else {
-                    console.warn('refreshContents: Filtered result is empty, ignoring update.');
-                }
-
-                if (validItems.length < parsed.length) {
-                    console.warn(`Filtered out ${parsed.length - validItems.length} invalid items from localStorage`);
-                }
-            }
-        }
-        // If localStorage is empty or invalid, keep the existing DEMO_CONTENTS (default data)
-    } catch (e) {
-        console.error('Failed to refresh from localStorage', e);
-    }
     return DEMO_CONTENTS;
 };
 
-// Initialize with saved content or default (and save defaults to localStorage on first load)
+// Initialize directly with defaults
 const loadInitialContents = (): DemoContent[] => {
-    try {
-        if (typeof window === 'undefined') return [];
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-            console.log('Found saved content in localStorage:', saved.length, 'bytes');
-            const parsed = JSON.parse(saved);
-            if (Array.isArray(parsed) && parsed.length > 0) {
-                const validItems = parsed.filter((item: any) => item && item.organization);
-                if (validItems.length > 0) {
-                    console.log(`Loaded ${validItems.length} valid items from localStorage (filtered from ${parsed.length})`);
-                    return validItems;
-                }
-                console.warn('LocalStorage contained data but all items were invalid. Falling back to defaults.');
-            }
-        } else {
-            console.log('No saved content found in localStorage, using defaults');
-        }
-    } catch (e) {
-        console.error('Failed to load from localStorage', e);
-    }
-
-    // First-time load: return defaults and save them to localStorage
-    const defaultContents: DemoContent[] = [
+    return [
         // --- DATA STRUCTURES & ALGORITHMS ---
         {
             id: 'dsa_1',
@@ -107,6 +45,8 @@ const loadInitialContents = (): DemoContent[] => {
             videoUrl: 'https://www.youtube.com/embed/1uADAjweDwk',
             tags: ['C', 'Arrays', 'Data Structures', 'Programming'], level: 'Beginner'
         },
+        // ... rest of the defaults are populated below in the original file ...
+
         {
             id: 'dsa_2',
             title: 'Graph Algorithms - BFS & DFS',
@@ -803,11 +743,4 @@ const loadInitialContents = (): DemoContent[] => {
 
 export const DEMO_CONTENTS: DemoContent[] = loadInitialContents();
 
-// Save defaults to localStorage on first load (ensures content persists across refreshes)
-if (!localStorage.getItem(STORAGE_KEY)) {
-    try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(DEMO_CONTENTS));
-    } catch (e) {
-        console.error('Failed to save initial contents to localStorage', e);
-    }
-}
+// LocalStorage persistence removed to prevent crashes.

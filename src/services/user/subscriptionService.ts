@@ -14,6 +14,7 @@ class SubscriptionService {
 
     // Get current user ID from auth storage
     private getCurrentUserId(): string | null {
+        if (typeof window === 'undefined') return null;
         const userStr = localStorage.getItem('openlearn_auth_user');
         if (!userStr) return null;
         try {
