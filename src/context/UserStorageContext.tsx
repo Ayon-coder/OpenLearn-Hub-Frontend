@@ -34,13 +34,13 @@ export const UserStorageProvider: React.FC<{ children: React.ReactNode }> = ({ c
     const [isSaving, setIsSaving] = useState(false);
 
     const fetchUserProfile = async () => {
-        if (!user || (!user.uid && !user.id)) {
+        if (!user || !user.id) {
             setLoading(false);
             setProfile(null);
             return;
         }
 
-        const userId = user.uid || user.id;
+        const userId = user.id;
         setLoading(true);
         try {
             const response = await axios.get(`${API_BASE_URL}/api/storage/user/${userId}`);
@@ -63,7 +63,7 @@ export const UserStorageProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
     const saveProfile = async (newProfile: UserProfile) => {
         if (!user) return;
-        const userId = user.uid || user.id;
+        const userId = user.id;
 
         setIsSaving(true);
         try {

@@ -36,7 +36,12 @@ export const FollowButton: React.FC<FollowButtonProps> = ({
             return;
         }
 
-        if (!profile) return;
+        if (!profile) {
+            console.warn('FollowButton: Profile not loaded yet');
+            // If still loading, tell the user
+            alert('Please wait, your user profile is still loading...');
+            return;
+        }
 
         setIsLoading(true);
 
