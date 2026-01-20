@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { DemoContent, DEMO_CONTENTS } from '../data/demoContents';
 
-const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export const useGlobalContent = () => {
     const [contents, setContents] = useState<DemoContent[]>([]);

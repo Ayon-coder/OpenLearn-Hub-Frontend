@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { DemoContent } from '@/data/demoContents';
 import { Subscription } from '@/types';
 
-const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export interface UserProfile {
     userId: string;
