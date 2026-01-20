@@ -43,6 +43,7 @@ export const addDemoContent = (content: DemoContent) => {
 // Refresh DEMO_CONTENTS from localStorage (for cross-tab or page refresh scenarios)
 export const refreshContents = (): DemoContent[] => {
     try {
+        if (typeof window === 'undefined') return DEMO_CONTENTS;
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
             const parsed = JSON.parse(saved);
@@ -74,6 +75,7 @@ export const refreshContents = (): DemoContent[] => {
 // Initialize with saved content or default (and save defaults to localStorage on first load)
 const loadInitialContents = (): DemoContent[] => {
     try {
+        if (typeof window === 'undefined') return [];
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
             console.log('Found saved content in localStorage:', saved.length, 'bytes');
