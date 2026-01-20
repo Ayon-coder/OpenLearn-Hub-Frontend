@@ -512,12 +512,34 @@ export const CurriculumResultPage: React.FC = () => {
 
     const { curriculum: data, formData } = curriculum;
 
+    console.log('Rendering CurriculumResultPage', { curriculum });
+
+    // Defensive check: Ensure inner data structure exists
+    if (!data) {
+        console.error('Curriculum data structure is missing or malformed', curriculum);
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+                <div className="bg-white rounded-3xl shadow-xl p-10 max-w-md text-center">
+                    <AlertCircle className="text-red-500 mx-auto mb-4" size={48} />
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Data Error</h2>
+                    <p className="text-gray-500 mb-6">This learning path data seems to be corrupted or in an old format.</p>
+                    <button
+                        onClick={() => navigate('/curriculum/generate')}
+                        className="px-6 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all"
+                    >
+                        Create New Curriculum
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
     // Data Normalization (Handle Legacy vs New Schema)
     const profile = {
-        summary: data.student_analysis?.profile_summary || data.student_profile?.summary || '',
-        starting_tier: data.student_analysis?.starting_tier || data.student_profile?.recommended_start_tier || 'Beginner',
-        weekly_hours: data.student_analysis?.weekly_hours_needed || data.student_profile?.weekly_hours || 0,
-        weeks: data.student_analysis?.estimated_completion_weeks || data.student_profile?.estimated_weeks || 0
+        summary: (data.student_analysis && data.student_analysis.profile_summary) || (data.student_profile && data.student_profile.summary) || 'Standard Learning Path',
+        starting_tier: (data.student_analysis && data.student_analysis.starting_tier) || (data.student_profile && data.student_profile.recommended_start_tier) || 'Beginner',
+        weekly_hours: (data.student_analysis && data.student_analysis.weekly_hours_needed) || (data.student_profile && data.student_profile.weekly_hours) || 0,
+        weeks: (data.student_analysis && data.student_analysis.estimated_completion_weeks) || (data.student_profile && data.student_profile.estimated_weeks) || 4
     };
     const tiers = data.learning_path || data.curriculum || {} as any;
 

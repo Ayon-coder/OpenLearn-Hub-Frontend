@@ -434,7 +434,7 @@ export const LearningPathsPage: React.FC = () => {
                                     <div
                                         key={curriculum.id}
                                         className="group bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-5 border border-purple-100 hover:shadow-lg transition-all cursor-pointer"
-                                        onClick={() => navigate(`/ curriculum / ${curriculum.id} `)}
+                                        onClick={() => navigate(`/curriculum/${curriculum.id}`)}
                                     >
                                         <div className="flex items-start justify-between mb-3">
                                             <div className="p-2 bg-purple-100 rounded-xl">
