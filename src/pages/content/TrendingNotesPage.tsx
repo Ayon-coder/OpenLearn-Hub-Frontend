@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     TrendingUp,
@@ -8,10 +8,9 @@ import {
     Users,
     Clock,
     GraduationCap,
-    ShieldCheck,
-    RefreshCw
+    ShieldCheck
 } from 'lucide-react';
-import { DEMO_CONTENTS, DemoContent, refreshContents } from '@/data/demoContents';
+import { DEMO_CONTENTS, DemoContent } from '@/data/demoContents';
 import { EnhancedContentCard } from '@/components/content/EnhancedContentCard';
 import { CourseGatekeeperModal } from '@/components/modals/CourseGatekeeperModal';
 
@@ -32,26 +31,8 @@ export const TrendingNotesPage: React.FC = () => {
     const [gatekeeperOpen, setGatekeeperOpen] = useState(false);
     const [selectedGatedContent, setSelectedGatedContent] = useState<DemoContent | null>(null);
 
-    // Content list state - refreshes from localStorage
-    const [contentList, setContentList] = useState<DemoContent[]>(DEMO_CONTENTS);
-    const [isRefreshing, setIsRefreshing] = useState(false);
-
-    // Refresh content from localStorage
-    const handleRefresh = useCallback(() => {
-        setIsRefreshing(true);
-        const freshContents = refreshContents();
-        setContentList([...freshContents]);
-        setTimeout(() => setIsRefreshing(false), 500);
-    }, []);
-
-    // Refresh on mount and when window gains focus (to catch new uploads)
-    useEffect(() => {
-        handleRefresh();
-
-        const onFocus = () => handleRefresh();
-        window.addEventListener('focus', onFocus);
-        return () => window.removeEventListener('focus', onFocus);
-    }, [handleRefresh]);
+    // Use DEMO_CONTENTS directly - it is initialized from localStorage at module level
+    const contentList = DEMO_CONTENTS;
 
     // Close dropdown on navigation/click outside
     useEffect(() => {
@@ -142,14 +123,6 @@ export const TrendingNotesPage: React.FC = () => {
                             Discover the most popular community contributions and top-rated course materials updated in real-time.
                         </p>
                     </div>
-                    <button
-                        onClick={handleRefresh}
-                        disabled={isRefreshing}
-                        className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl text-sm font-bold transition-all disabled:opacity-50"
-                    >
-                        <RefreshCw size={16} className={isRefreshing ? 'animate-spin' : ''} />
-                        {isRefreshing ? 'Refreshing...' : 'Refresh'}
-                    </button>
                 </div>
             </div>
 
