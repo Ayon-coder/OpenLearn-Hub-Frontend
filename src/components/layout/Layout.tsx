@@ -25,6 +25,8 @@ import {
 import { authService } from '@/services/auth/authService';
 import { AuthRequiredModal } from '@/components/modals/AuthRequiredModal';
 import { User } from '@/types';
+import { useUserStorage } from '@/hooks/useUserStorage';
+import { useUserStorage } from '@/hooks/useUserStorage';
 
 const NavItem: React.FC<{ to: string; icon: React.ReactNode; label: string; active: boolean; onClick?: () => void }> = ({ to, icon, label, active, onClick }) => (
   <Link
@@ -45,9 +47,18 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [user, setUser] = useState<User | null>(authService.getUser());
+  const { loading, error, dismissError } = useUserStorage();
+
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authModalFeature, setAuthModalFeature] = useState('');
+
+  // Use user storage for global loading state
+  const { loading, error } = useUserStorage();
+  // We need a way to clear error, but it's not exposed yet. 
+  // Ideally useUserStorage should expose setError or a dismiss function.
+  // For now, we will assume we can't clear it or we'll modify Context next.
+  const [localErrorDismissed, setLocalErrorDismissed] = useState(false);
 
   useEffect(() => {
     const handleAuth = () => {
@@ -80,11 +91,52 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   return (
     <div className="min-h-screen flex bg-gray-50 overflow-hidden">
       {/* Auth Required Modal */}
+      {/* Auth Required Modal */}
       <AuthRequiredModal
         isOpen={authModalOpen}
         onClose={() => setAuthModalOpen(false)}
         feature={authModalFeature}
       />
+
+      {/* Global Loading Bar */}
+      {user && loading && (
+        <div className="fixed top-0 left-0 right-0 h-1 bg-gray-200 z-[100]">
+          <div className="h-full bg-blue-600 animate-[progress_1s_ease-in-out_infinite]" style={{ width: '100%' }}></div>
+        </div>
+      )}
+
+      {/* Global Error Banner */}
+      {user && error && (
+        <div className="fixed top-0 left-0 right-0 bg-red-500 text-white z-[90] px-4 py-2 flex items-center justify-between shadow-md">
+          <div className="flex items-center space-x-2 text-sm font-medium">
+            <span className="font-bold">Connection Error:</span> {error}
+            <button onClick={() => window.location.reload()} className="underline ml-2 hover:text-red-100">Retry</button>
+          </div>
+          <button onClick={() => dismissError?.()} className="p-1 hover:bg-white/20 rounded-full">
+            <X size={16} />
+          </button>
+        </div>
+      )}
+
+      {/* Global Loading Bar */}
+      {user && loading && (
+        <div className="fixed top-0 left-0 right-0 h-1 bg-gray-200 z-[100]">
+          <div className="h-full bg-blue-600 animate-[progress_1s_ease-in-out_infinite]" style={{ width: '100%' }}></div>
+        </div>
+      )}
+
+      {/* Global Error Banner (e.g. for 500 errors) */}
+      {user && error && (
+        <div className="fixed top-0 left-0 right-0 bg-red-500 text-white z-[90] px-4 py-2 flex items-center justify-between shadow-md">
+          <div className="flex items-center space-x-2 text-sm font-medium">
+            <span className="font-bold">Connection Error:</span> {error}
+            <button onClick={() => window.location.reload()} className="underline ml-2 hover:text-red-100">Retry</button>
+          </div>
+          <button onClick={() => setError(null)} className="p-1 hover:bg-white/20 rounded-full">
+            <X size={16} />
+          </button>
+        </div>
+      )}
 
       {/* Sidebar */}
       <aside className={`

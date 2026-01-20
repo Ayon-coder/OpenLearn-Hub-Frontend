@@ -21,6 +21,7 @@ interface UserStorageContextType {
     isSaving: boolean;
     addToUploads: (content: DemoContent) => Promise<void>;
     updateSubscriptions: (newSubscriptions: Subscription[]) => Promise<void>;
+    dismissError: () => void;
     refreshProfile: () => Promise<void>;
 }
 
@@ -32,6 +33,8 @@ export const UserStorageProvider: React.FC<{ children: React.ReactNode }> = ({ c
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isSaving, setIsSaving] = useState(false);
+
+    const dismissError = () => setError(null);
 
     const fetchUserProfile = async () => {
         if (!user || !user.id) {
@@ -127,6 +130,7 @@ export const UserStorageProvider: React.FC<{ children: React.ReactNode }> = ({ c
             isSaving,
             addToUploads,
             updateSubscriptions,
+            dismissError,
             refreshProfile: fetchUserProfile
         }}>
             {children}
