@@ -99,7 +99,7 @@ export const BrowseByPathPage: React.FC = () => {
     const getUniqueSubjects = () => {
         const subjects = new Set<string>();
         DEMO_CONTENTS.forEach(c => {
-            if (c.organization.subjectPath) {
+            if (c.organization?.subjectPath) {
                 subjects.add(c.organization.subjectPath.subject);
             }
         });
@@ -109,7 +109,7 @@ export const BrowseByPathPage: React.FC = () => {
     const getTopicsForSubject = (subject: string) => {
         const topics = new Set<string>();
         DEMO_CONTENTS.forEach(c => {
-            if (c.organization.subjectPath?.subject === subject) {
+            if (c.organization?.subjectPath?.subject === subject) {
                 topics.add(c.organization.subjectPath.coreTopic);
             }
         });
@@ -119,8 +119,8 @@ export const BrowseByPathPage: React.FC = () => {
     const getSubtopicsForTopic = (subject: string, topic: string) => {
         const subtopics = new Set<string>();
         DEMO_CONTENTS.forEach(c => {
-            if (c.organization.subjectPath?.subject === subject &&
-                c.organization.subjectPath?.coreTopic === topic) {
+            if (c.organization?.subjectPath?.subject === subject &&
+                c.organization?.subjectPath?.coreTopic === topic) {
                 subtopics.add(c.organization.subjectPath.subtopic);
             }
         });
@@ -129,9 +129,9 @@ export const BrowseByPathPage: React.FC = () => {
 
     const getContentForSubtopic = (subject: string, topic: string, subtopic: string) => {
         return DEMO_CONTENTS.filter(c =>
-            c.organization.subjectPath?.subject === subject &&
-            c.organization.subjectPath?.coreTopic === topic &&
-            c.organization.subjectPath?.subtopic === subtopic
+            c.organization?.subjectPath?.subject === subject &&
+            c.organization?.subjectPath?.coreTopic === topic &&
+            c.organization?.subjectPath?.subtopic === subtopic
         );
     };
 
@@ -139,7 +139,7 @@ export const BrowseByPathPage: React.FC = () => {
     const getUniqueUniversities = () => {
         const universities = new Set<string>();
         DEMO_CONTENTS.forEach(c => {
-            if (c.organization.universityPath) {
+            if (c.organization?.universityPath) {
                 universities.add(c.organization.universityPath.university);
             }
         });
@@ -149,7 +149,7 @@ export const BrowseByPathPage: React.FC = () => {
     const getSemestersForUniversity = (university: string) => {
         const semesters = new Set<string>();
         DEMO_CONTENTS.forEach(c => {
-            if (c.organization.universityPath?.university === university) {
+            if (c.organization?.universityPath?.university === university) {
                 semesters.add(c.organization.universityPath.semester);
             }
         });
@@ -159,8 +159,8 @@ export const BrowseByPathPage: React.FC = () => {
     const getDepartmentsForSemester = (university: string, semester: string) => {
         const departments = new Set<string>();
         DEMO_CONTENTS.forEach(c => {
-            if (c.organization.universityPath?.university === university &&
-                c.organization.universityPath?.semester === semester) {
+            if (c.organization?.universityPath?.university === university &&
+                c.organization?.universityPath?.semester === semester) {
                 departments.add(c.organization.universityPath.department);
             }
         });
@@ -170,9 +170,9 @@ export const BrowseByPathPage: React.FC = () => {
     const getSubjectsForDepartment = (university: string, semester: string, department: string) => {
         const subjects = new Set<string>();
         DEMO_CONTENTS.forEach(c => {
-            if (c.organization.universityPath?.university === university &&
-                c.organization.universityPath?.semester === semester &&
-                c.organization.universityPath?.department === department) {
+            if (c.organization?.universityPath?.university === university &&
+                c.organization?.universityPath?.semester === semester &&
+                c.organization?.universityPath?.department === department) {
                 subjects.add(c.organization.universityPath.subject);
             }
         });
@@ -182,10 +182,10 @@ export const BrowseByPathPage: React.FC = () => {
     const getTopicsForUniSubject = (university: string, semester: string, department: string, subject: string) => {
         const topics = new Set<string>();
         DEMO_CONTENTS.forEach(c => {
-            if (c.organization.universityPath?.university === university &&
-                c.organization.universityPath?.semester === semester &&
-                c.organization.universityPath?.department === department &&
-                c.organization.universityPath?.subject === subject) {
+            if (c.organization?.universityPath?.university === university &&
+                c.organization?.universityPath?.semester === semester &&
+                c.organization?.universityPath?.department === department &&
+                c.organization?.universityPath?.subject === subject) {
                 topics.add(c.organization.universityPath.topic);
             }
         });
@@ -194,11 +194,11 @@ export const BrowseByPathPage: React.FC = () => {
 
     const getContentForUniTopic = (university: string, semester: string, department: string, subject: string, topic: string) => {
         return DEMO_CONTENTS.filter(c =>
-            c.organization.universityPath?.university === university &&
-            c.organization.universityPath?.semester === semester &&
-            c.organization.universityPath?.department === department &&
-            c.organization.universityPath?.subject === subject &&
-            c.organization.universityPath?.topic === topic
+            c.organization?.universityPath?.university === university &&
+            c.organization?.universityPath?.semester === semester &&
+            c.organization?.universityPath?.department === department &&
+            c.organization?.universityPath?.subject === subject &&
+            c.organization?.universityPath?.topic === topic
         );
     };
 
@@ -206,7 +206,7 @@ export const BrowseByPathPage: React.FC = () => {
     const getUniqueChannels = () => {
         const channels = new Set<string>();
         DEMO_CONTENTS.forEach(c => {
-            if (c.organization.channelPath) {
+            if (c.organization?.channelPath) {
                 channels.add(c.organization.channelPath.channelName);
             }
         });
@@ -216,7 +216,7 @@ export const BrowseByPathPage: React.FC = () => {
     const getPlaylistsForChannel = (channel: string) => {
         const playlists = new Set<string>();
         DEMO_CONTENTS.forEach(c => {
-            if (c.organization.channelPath?.channelName === channel) {
+            if (c.organization?.channelPath?.channelName === channel) {
                 playlists.add(c.organization.channelPath.playlistName);
             }
         });
@@ -226,8 +226,8 @@ export const BrowseByPathPage: React.FC = () => {
     const getTopicsForPlaylist = (channel: string, playlist: string) => {
         const topics = new Set<string>();
         DEMO_CONTENTS.forEach(c => {
-            if (c.organization.channelPath?.channelName === channel &&
-                c.organization.channelPath?.playlistName === playlist) {
+            if (c.organization?.channelPath?.channelName === channel &&
+                c.organization?.channelPath?.playlistName === playlist) {
                 topics.add(c.organization.channelPath.topic);
             }
         });
@@ -236,9 +236,9 @@ export const BrowseByPathPage: React.FC = () => {
 
     const getContentForChannelTopic = (channel: string, playlist: string, topic: string) => {
         return DEMO_CONTENTS.filter(c =>
-            c.organization.channelPath?.channelName === channel &&
-            c.organization.channelPath?.playlistName === playlist &&
-            c.organization.channelPath?.topic === topic
+            c.organization?.channelPath?.channelName === channel &&
+            c.organization?.channelPath?.playlistName === playlist &&
+            c.organization?.channelPath?.topic === topic
         );
     };
 
@@ -246,7 +246,7 @@ export const BrowseByPathPage: React.FC = () => {
     const getUniqueProviders = () => {
         const providers = new Set<string>();
         DEMO_CONTENTS.forEach(c => {
-            if (c.organization.coursePath) {
+            if (c.organization?.coursePath) {
                 providers.add(c.organization.coursePath.provider);
             }
         });
@@ -256,7 +256,7 @@ export const BrowseByPathPage: React.FC = () => {
     const getInstructorsForProvider = (provider: string) => {
         const instructors = new Set<string>();
         DEMO_CONTENTS.forEach(c => {
-            if (c.organization.coursePath?.provider === provider) {
+            if (c.organization?.coursePath?.provider === provider) {
                 instructors.add(c.organization.coursePath.instructor);
             }
         });
@@ -266,8 +266,8 @@ export const BrowseByPathPage: React.FC = () => {
     const getCoursesForInstructor = (provider: string, instructor: string) => {
         const courses = new Set<string>();
         DEMO_CONTENTS.forEach(c => {
-            if (c.organization.coursePath?.provider === provider &&
-                c.organization.coursePath?.instructor === instructor) {
+            if (c.organization?.coursePath?.provider === provider &&
+                c.organization?.coursePath?.instructor === instructor) {
                 courses.add(c.organization.coursePath.courseName);
             }
         });
@@ -277,9 +277,9 @@ export const BrowseByPathPage: React.FC = () => {
     const getTopicsForCourse = (provider: string, instructor: string, course: string) => {
         const topics = new Set<string>();
         DEMO_CONTENTS.forEach(c => {
-            if (c.organization.coursePath?.provider === provider &&
-                c.organization.coursePath?.instructor === instructor &&
-                c.organization.coursePath?.courseName === course) {
+            if (c.organization?.coursePath?.provider === provider &&
+                c.organization?.coursePath?.instructor === instructor &&
+                c.organization?.coursePath?.courseName === course) {
                 topics.add(c.organization.coursePath.topic);
             }
         });
@@ -288,10 +288,10 @@ export const BrowseByPathPage: React.FC = () => {
 
     const getContentForCourseTopic = (provider: string, instructor: string, course: string, topic: string) => {
         return DEMO_CONTENTS.filter(c =>
-            c.organization.coursePath?.provider === provider &&
-            c.organization.coursePath?.instructor === instructor &&
-            c.organization.coursePath?.courseName === course &&
-            c.organization.coursePath?.topic === topic
+            c.organization?.coursePath?.provider === provider &&
+            c.organization?.coursePath?.instructor === instructor &&
+            c.organization?.coursePath?.courseName === course &&
+            c.organization?.coursePath?.topic === topic
         );
     };
 
@@ -299,7 +299,7 @@ export const BrowseByPathPage: React.FC = () => {
     const getUniqueExams = () => {
         const exams = new Set<string>();
         DEMO_CONTENTS.forEach(c => {
-            if (c.organization.competitiveExamPath) {
+            if (c.organization?.competitiveExamPath) {
                 exams.add(c.organization.competitiveExamPath.exam);
             }
         });
@@ -309,7 +309,7 @@ export const BrowseByPathPage: React.FC = () => {
     const getYearsForExam = (exam: string) => {
         const years = new Set<string>();
         DEMO_CONTENTS.forEach(c => {
-            if (c.organization.competitiveExamPath?.exam === exam) {
+            if (c.organization?.competitiveExamPath?.exam === exam) {
                 years.add(c.organization.competitiveExamPath.year);
             }
         });
@@ -319,8 +319,8 @@ export const BrowseByPathPage: React.FC = () => {
     const getSubjectsForExamYear = (exam: string, year: string) => {
         const subjects = new Set<string>();
         DEMO_CONTENTS.forEach(c => {
-            if (c.organization.competitiveExamPath?.exam === exam &&
-                c.organization.competitiveExamPath?.year === year) {
+            if (c.organization?.competitiveExamPath?.exam === exam &&
+                c.organization?.competitiveExamPath?.year === year) {
                 subjects.add(c.organization.competitiveExamPath.subject);
             }
         });
@@ -330,9 +330,9 @@ export const BrowseByPathPage: React.FC = () => {
     const getTopicsForExamSubject = (exam: string, year: string, subject: string) => {
         const topics = new Set<string>();
         DEMO_CONTENTS.forEach(c => {
-            if (c.organization.competitiveExamPath?.exam === exam &&
-                c.organization.competitiveExamPath?.year === year &&
-                c.organization.competitiveExamPath?.subject === subject) {
+            if (c.organization?.competitiveExamPath?.exam === exam &&
+                c.organization?.competitiveExamPath?.year === year &&
+                c.organization?.competitiveExamPath?.subject === subject) {
                 topics.add(c.organization.competitiveExamPath.topic);
             }
         });
@@ -341,10 +341,10 @@ export const BrowseByPathPage: React.FC = () => {
 
     const getContentForExamTopic = (exam: string, year: string, subject: string, topic: string) => {
         return DEMO_CONTENTS.filter(c =>
-            c.organization.competitiveExamPath?.exam === exam &&
-            c.organization.competitiveExamPath?.year === year &&
-            c.organization.competitiveExamPath?.subject === subject &&
-            c.organization.competitiveExamPath?.topic === topic
+            c.organization?.competitiveExamPath?.exam === exam &&
+            c.organization?.competitiveExamPath?.year === year &&
+            c.organization?.competitiveExamPath?.subject === subject &&
+            c.organization?.competitiveExamPath?.topic === topic
         );
     };
 
@@ -533,7 +533,7 @@ export const BrowseByPathPage: React.FC = () => {
                                             <div key={subject} className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${index * 50}ms` }}>
                                                 {renderCategoryCard(
                                                     subject,
-                                                    DEMO_CONTENTS.filter(c => c.organization.subjectPath?.subject === subject).length,
+                                                    DEMO_CONTENTS.filter(c => c.organization?.subjectPath?.subject === subject).length,
                                                     () => { setSelectedSubject(subject); setSearchTerm(''); },
                                                     'blue',
                                                     'from-blue-500 to-blue-600'
@@ -551,7 +551,7 @@ export const BrowseByPathPage: React.FC = () => {
                                             <div key={topic} className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${index * 50}ms` }}>
                                                 {renderCategoryCard(
                                                     topic,
-                                                    DEMO_CONTENTS.filter(c => c.organization.subjectPath?.subject === selectedSubject && c.organization.subjectPath?.coreTopic === topic).length,
+                                                    DEMO_CONTENTS.filter(c => c.organization?.subjectPath?.subject === selectedSubject && c.organization?.subjectPath?.coreTopic === topic).length,
                                                     () => { setSelectedTopic(topic); setSearchTerm(''); },
                                                     'blue',
                                                     'from-blue-500 to-blue-600'
@@ -569,7 +569,7 @@ export const BrowseByPathPage: React.FC = () => {
                                             <div key={subtopic} className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${index * 50}ms` }}>
                                                 {renderCategoryCard(
                                                     subtopic,
-                                                    DEMO_CONTENTS.filter(c => c.organization.subjectPath?.subject === selectedSubject && c.organization.subjectPath?.coreTopic === selectedTopic && c.organization.subjectPath?.subtopic === subtopic).length,
+                                                    DEMO_CONTENTS.filter(c => c.organization?.subjectPath?.subject === selectedSubject && c.organization?.subjectPath?.coreTopic === selectedTopic && c.organization?.subjectPath?.subtopic === subtopic).length,
                                                     () => { setSelectedSubtopic(subtopic); setSearchTerm(''); },
                                                     'blue',
                                                     'from-blue-500 to-blue-600'
@@ -620,7 +620,7 @@ export const BrowseByPathPage: React.FC = () => {
                                             <div key={university} className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${index * 50}ms` }}>
                                                 {renderCategoryCard(
                                                     university,
-                                                    DEMO_CONTENTS.filter(c => c.organization.universityPath?.university === university).length,
+                                                    DEMO_CONTENTS.filter(c => c.organization?.universityPath?.university === university).length,
                                                     () => { setSelectedUniversity(university); setSearchTerm(''); },
                                                     'blue',
                                                     'from-blue-600 to-indigo-600'
@@ -638,7 +638,7 @@ export const BrowseByPathPage: React.FC = () => {
                                             <div key={semester} className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${index * 50}ms` }}>
                                                 {renderCategoryCard(
                                                     `Semester ${semester}`,
-                                                    DEMO_CONTENTS.filter(c => c.organization.universityPath?.university === selectedUniversity && c.organization.universityPath?.semester === semester).length,
+                                                    DEMO_CONTENTS.filter(c => c.organization?.universityPath?.university === selectedUniversity && c.organization?.universityPath?.semester === semester).length,
                                                     () => { setSelectedSemester(semester); setSearchTerm(''); },
                                                     'blue',
                                                     'from-blue-600 to-indigo-600'
@@ -656,7 +656,7 @@ export const BrowseByPathPage: React.FC = () => {
                                             <div key={department} className="animate-in fade-in-from-bottom-4 duration-500" style={{ animationDelay: `${index * 50}ms` }}>
                                                 {renderCategoryCard(
                                                     department,
-                                                    DEMO_CONTENTS.filter(c => c.organization.universityPath?.university === selectedUniversity && c.organization.universityPath?.semester === selectedSemester && c.organization.universityPath?.department === department).length,
+                                                    DEMO_CONTENTS.filter(c => c.organization?.universityPath?.university === selectedUniversity && c.organization?.universityPath?.semester === selectedSemester && c.organization?.universityPath?.department === department).length,
                                                     () => { setSelectedDepartment(department); setSearchTerm(''); },
                                                     'blue',
                                                     'from-blue-600 to-indigo-600'
@@ -674,7 +674,7 @@ export const BrowseByPathPage: React.FC = () => {
                                             <div key={subject} className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${index * 50}ms` }}>
                                                 {renderCategoryCard(
                                                     subject,
-                                                    DEMO_CONTENTS.filter(c => c.organization.universityPath?.university === selectedUniversity && c.organization.universityPath?.semester === selectedSemester && c.organization.universityPath?.department === selectedDepartment && c.organization.universityPath?.subject === subject).length,
+                                                    DEMO_CONTENTS.filter(c => c.organization?.universityPath?.university === selectedUniversity && c.organization?.universityPath?.semester === selectedSemester && c.organization?.universityPath?.department === selectedDepartment && c.organization?.universityPath?.subject === subject).length,
                                                     () => { setSelectedUniSubject(subject); setSearchTerm(''); },
                                                     'blue',
                                                     'from-blue-600 to-indigo-600'
@@ -692,7 +692,7 @@ export const BrowseByPathPage: React.FC = () => {
                                             <div key={topic} className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${index * 50}ms` }}>
                                                 {renderCategoryCard(
                                                     topic,
-                                                    DEMO_CONTENTS.filter(c => c.organization.universityPath?.university === selectedUniversity && c.organization.universityPath?.semester === selectedSemester && c.organization.universityPath?.department === selectedDepartment && c.organization.universityPath?.subject === selectedUniSubject && c.organization.universityPath?.topic === topic).length,
+                                                    DEMO_CONTENTS.filter(c => c.organization?.universityPath?.university === selectedUniversity && c.organization?.universityPath?.semester === selectedSemester && c.organization?.universityPath?.department === selectedDepartment && c.organization?.universityPath?.subject === selectedUniSubject && c.organization?.universityPath?.topic === topic).length,
                                                     () => { setSelectedUniTopic(topic); setSearchTerm(''); },
                                                     'blue',
                                                     'from-blue-600 to-indigo-600'
@@ -743,7 +743,7 @@ export const BrowseByPathPage: React.FC = () => {
                                             <div key={channel} className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${index * 50}ms` }}>
                                                 {renderCategoryCard(
                                                     channel,
-                                                    DEMO_CONTENTS.filter(c => c.organization.channelPath?.channelName === channel).length,
+                                                    DEMO_CONTENTS.filter(c => c.organization?.channelPath?.channelName === channel).length,
                                                     () => { setSelectedChannel(channel); setSearchTerm(''); },
                                                     'blue',
                                                     'from-cyan-500 to-blue-600'
@@ -761,7 +761,7 @@ export const BrowseByPathPage: React.FC = () => {
                                             <div key={playlist} className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${index * 50}ms` }}>
                                                 {renderCategoryCard(
                                                     playlist,
-                                                    DEMO_CONTENTS.filter(c => c.organization.channelPath?.channelName === selectedChannel && c.organization.channelPath?.playlistName === playlist).length,
+                                                    DEMO_CONTENTS.filter(c => c.organization?.channelPath?.channelName === selectedChannel && c.organization?.channelPath?.playlistName === playlist).length,
                                                     () => { setSelectedPlaylist(playlist); setSearchTerm(''); },
                                                     'blue',
                                                     'from-cyan-500 to-blue-600'
@@ -779,7 +779,7 @@ export const BrowseByPathPage: React.FC = () => {
                                             <div key={topic} className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${index * 50}ms` }}>
                                                 {renderCategoryCard(
                                                     topic,
-                                                    DEMO_CONTENTS.filter(c => c.organization.channelPath?.channelName === selectedChannel && c.organization.channelPath?.playlistName === selectedPlaylist && c.organization.channelPath?.topic === topic).length,
+                                                    DEMO_CONTENTS.filter(c => c.organization?.channelPath?.channelName === selectedChannel && c.organization?.channelPath?.playlistName === selectedPlaylist && c.organization?.channelPath?.topic === topic).length,
                                                     () => { setSelectedChannelTopic(topic); setSearchTerm(''); },
                                                     'blue',
                                                     'from-cyan-500 to-blue-600'

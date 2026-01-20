@@ -425,12 +425,12 @@ class SubscriptionService {
                 const allNotes: CreatorNote[] = creatorContent.map(content => ({
                     id: content.id,
                     title: content.title,
-                    subject: content.organization.subjectPath?.subject || '',
-                    topic: content.organization.subjectPath?.coreTopic || '',
-                    subtopic: content.organization.subjectPath?.subtopic,
+                    subject: content.organization?.subjectPath?.subject || '',
+                    topic: content.organization?.subjectPath?.coreTopic || '',
+                    subtopic: content.organization?.subjectPath?.subtopic,
                     uploadedAt: content.uploadedAt,
-                    isCourseNote: !!(content.organization.universityPath || content.organization.coursePath),
-                    courseId: content.organization.universityPath ?
+                    isCourseNote: !!(content.organization?.universityPath || content.organization?.coursePath),
+                    courseId: content.organization?.universityPath ?
                         `course_${content.organization.universityPath.university}_${content.organization.universityPath.subject}` :
                         undefined,
                     previewAvailable: false

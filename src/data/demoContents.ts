@@ -68,7 +68,13 @@ export const refreshContents = (): DemoContent[] => {
             if (Array.isArray(parsed) && parsed.length > 0) {
                 // Update the DEMO_CONTENTS array in-place only if we have valid data
                 DEMO_CONTENTS.length = 0;
-                DEMO_CONTENTS.push(...parsed);
+                // Filter out any invalid items (missing organization, etc.)
+                const validItems = parsed.filter(item => item && item.organization);
+                DEMO_CONTENTS.push(...validItems);
+
+                if (validItems.length < parsed.length) {
+                    console.warn(`Filtered out ${parsed.length - validItems.length} invalid items from localStorage`);
+                }
             }
         }
         // If localStorage is empty or invalid, keep the existing DEMO_CONTENTS (default data)
@@ -86,8 +92,9 @@ const loadInitialContents = (): DemoContent[] => {
             console.log('Found saved content in localStorage:', saved.length, 'bytes');
             const parsed = JSON.parse(saved);
             if (Array.isArray(parsed) && parsed.length > 0) {
-                console.log(`Loaded ${parsed.length} items from localStorage`);
-                return parsed;
+                const validItems = parsed.filter((item: any) => item && item.organization);
+                console.log(`Loaded ${validItems.length} valid items from localStorage (filtered from ${parsed.length})`);
+                return validItems;
             }
         } else {
             console.log('No saved content found in localStorage, using defaults');

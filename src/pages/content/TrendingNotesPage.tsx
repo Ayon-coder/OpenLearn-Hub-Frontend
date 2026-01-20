@@ -51,6 +51,9 @@ export const TrendingNotesPage: React.FC = () => {
 
     // Filter Logic
     const filterContent = (content: DemoContent) => {
+        // Safety check
+        if (!content || !content.organization) return false;
+
         // Tab Filter - match the badge logic (universityPath or coursePath = Course)
         const isCourse = !!(content.organization.universityPath || content.organization.coursePath);
         if (activeTab === 'course' && !isCourse) return false;
@@ -102,9 +105,9 @@ export const TrendingNotesPage: React.FC = () => {
         .sort(sortContent);
 
     // Extract unique subjects for the tag filter
-    const subjects = Array.from(new Set(contentList.map(c => c.organization.subjectPath?.subject).filter(Boolean)));
+    const subjects = Array.from(new Set(contentList.map(c => c.organization?.subjectPath?.subject).filter(Boolean)));
     // Extract unique institutions
-    const institutions = Array.from(new Set(contentList.map(c => c.organization.universityPath?.university).filter(Boolean)));
+    const institutions = Array.from(new Set(contentList.map(c => c.organization?.universityPath?.university).filter(Boolean)));
 
     return (
         <div className="space-y-8 pb-12 max-w-[1600px] mx-auto">
