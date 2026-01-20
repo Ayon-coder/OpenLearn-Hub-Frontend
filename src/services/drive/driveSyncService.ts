@@ -74,7 +74,25 @@ export const driveSyncService = {
       allowLocalDownload: true // Own uploads are always downloadable
     };
 
-    localStorage.setItem(getDriveStorageKey(), JSON.stringify([newItem, ...items]));
+    try {
+      // Strip large base64 images from localStorage to save space
+      const storageItem = { ...newItem };
+      if (storageItem.coverImage && storageItem.coverImage.startsWith('data:image') && storageItem.coverImage.length > 5000) {
+        storageItem.coverImage = undefined;
+      }
+
+      // Also sanitize existing items if they happen to have large images (migration)
+      const safeItems = [storageItem, ...items].map(item => {
+        if (item.coverImage && item.coverImage.startsWith('data:image') && item.coverImage.length > 5000) {
+          return { ...item, coverImage: undefined };
+        }
+        return item;
+      });
+
+      localStorage.setItem(getDriveStorageKey(), JSON.stringify(safeItems));
+    } catch (e) {
+      console.error('Failed to save drive item to localStorage', e);
+    }
     window.dispatchEvent(new Event('drive-sync'));
 
     // Sync to Firestore in background
