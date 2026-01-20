@@ -12,10 +12,37 @@ import { DEMO_CONTENTS, DemoContent } from '@/data/demoContents';
 
 // Helper to find matching platform content by topic keywords
 function findPlatformContent(topics: string[], title: string): DemoContent[] {
-    const keywords = [...topics, ...title.toLowerCase().split(' ')].map(k => k.toLowerCase());
+    // Common words to exclude from matching
+    const stopWords = new Set([
+        'the', 'and', 'for', 'with', 'from', 'into', 'using', 'learn', 'learning',
+        'basics', 'basic', 'introduction', 'intro', 'advanced', 'beginner', 'course',
+        'tutorial', 'guide', 'complete', 'full', 'how', 'what', 'why', 'when',
+        'data', 'code', 'programming', 'development', 'building', 'creating'
+    ]);
+
+    // Extract meaningful keywords (5+ chars, not stopwords)
+    const keywords = [...topics, ...title.split(' ')]
+        .map(k => k.toLowerCase().replace(/[^a-z0-9]/g, ''))
+        .filter(k => k.length >= 5 && !stopWords.has(k));
+
+    // Also keep exact topic matches (even if shorter)
+    const exactTopics = topics.map(t => t.toLowerCase());
+
     return DEMO_CONTENTS.filter(content => {
-        const searchText = `${content.title} ${content.description}`.toLowerCase();
-        return keywords.some(keyword => keyword.length > 3 && searchText.includes(keyword));
+        const contentTitle = content.title.toLowerCase();
+        const contentDesc = content.description?.toLowerCase() || '';
+
+        // Check for exact topic match in title (stronger signal)
+        const hasExactTopicMatch = exactTopics.some(topic =>
+            contentTitle.includes(topic) || topic.includes(contentTitle.split(' ')[0])
+        );
+
+        // Check for keyword matches (require at least 2 matches for longer titles)
+        const keywordMatches = keywords.filter(keyword =>
+            contentTitle.includes(keyword) || contentDesc.includes(keyword)
+        );
+
+        return hasExactTopicMatch || keywordMatches.length >= 2;
     }).slice(0, 3); // Max 3 matches
 }
 
@@ -191,13 +218,13 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, tierColor }) => {
                                                 >
                                                     {/* Hover gradient */}
                                                     <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${resource.platform === 'YouTube'
-                                                            ? 'bg-gradient-to-br from-red-50 to-orange-50'
-                                                            : 'bg-gradient-to-br from-green-50 to-emerald-50'
+                                                        ? 'bg-gradient-to-br from-red-50 to-orange-50'
+                                                        : 'bg-gradient-to-br from-green-50 to-emerald-50'
                                                         }`} />
 
                                                     <div className={`relative p-3 rounded-xl shadow-sm transition-all duration-300 group-hover:scale-110 ${resource.platform === 'YouTube'
-                                                            ? 'bg-gradient-to-br from-red-500 to-orange-500'
-                                                            : 'bg-gradient-to-br from-green-500 to-emerald-500'
+                                                        ? 'bg-gradient-to-br from-red-500 to-orange-500'
+                                                        : 'bg-gradient-to-br from-green-500 to-emerald-500'
                                                         }`}>
                                                         {resource.platform === 'YouTube' ? (
                                                             <Youtube size={18} className="text-white" />
