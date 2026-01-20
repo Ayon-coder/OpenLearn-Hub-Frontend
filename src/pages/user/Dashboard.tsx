@@ -34,7 +34,7 @@ import { driveSyncService } from '@/services/drive/driveSyncService';
 import { curriculumService, SavedCurriculum } from '@/services/curriculum/curriculumService';
 import { authService } from '@/services/auth/authService';
 import { AuthRequiredModal } from '@/components/modals/AuthRequiredModal';
-import { User, DriveItem } from '@/types';
+import { User, DriveItem, DriveSource } from '@/types';
 
 // Helper Components
 interface ActionCardProps {
@@ -437,13 +437,13 @@ export const Dashboard: React.FC = () => {
               <StatCard
                 icon={<Download />}
                 label="Downloaded"
-                value={driveItems.filter(i => i.source === 'downloaded').length.toString()}
+                value={driveItems.filter(i => i.source === DriveSource.Downloaded).length.toString()}
                 color="bg-green-500"
               />
               <StatCard
                 icon={<Upload />}
                 label="Uploaded"
-                value={driveItems.filter(i => i.source === 'uploaded').length.toString()}
+                value={driveItems.filter(i => i.source === DriveSource.Uploaded).length.toString()}
                 color="bg-purple-500"
               />
               <StatCard
