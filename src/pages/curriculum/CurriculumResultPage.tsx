@@ -543,6 +543,9 @@ export const CurriculumResultPage: React.FC = () => {
     };
     const tiers = data.learning_path || data.curriculum || {} as any;
 
+    // Use formData with generic fallback to prevent crashes
+    const safeFormData = formData || { learning_goal: 'Learning Path', current_level: 'Beginner' };
+
     return (
         <div className="min-h-screen bg-gray-50 py-12 px-6">
             <div className="max-w-5xl mx-auto">
@@ -561,7 +564,7 @@ export const CurriculumResultPage: React.FC = () => {
                         <div>
                             <div className="flex items-center space-x-3 mb-4">
                                 <GraduationCap size={32} />
-                                <h1 className="text-3xl font-black">{formData.learning_goal}</h1>
+                                <h1 className="text-3xl font-black">{safeFormData.learning_goal || 'Generic Learning Path'}</h1>
                             </div>
                             <p className="text-white/80 max-w-2xl">{profile.summary}</p>
                         </div>
