@@ -762,3 +762,12 @@ const loadInitialContents = (): DemoContent[] => {
 };
 
 export const DEMO_CONTENTS: DemoContent[] = loadInitialContents();
+
+// Save defaults to localStorage on first load (ensures content persists across refreshes)
+if (!localStorage.getItem(STORAGE_KEY)) {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(DEMO_CONTENTS));
+    } catch (e) {
+        console.error('Failed to save initial contents to localStorage', e);
+    }
+}
