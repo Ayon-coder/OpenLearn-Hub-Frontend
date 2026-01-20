@@ -40,6 +40,13 @@ The **OpenLearn Hub Frontend** is a cutting-edge educational web application des
 - **AI Assistant**: Integrated chatbot powered by Gemini/Groq for instant doubt resolution
 - **Mentor Mode**: Interactive conversations with AI for personalized learning guidance
 - **Concept Mirror**: AI-powered concept analysis and feedback system
+- **AI Curriculum Generator**: Personalized learning paths based on your goals, level, and style
+
+### 🎓 Learning Paths
+- **Pre-built Paths**: Curated learning journeys for Tech Skills, BSc Subjects, and Competitive Exams
+- **Multiple Levels**: Beginner, Intermediate, and Advanced tracks for each domain
+- **Resource Mapping**: Links to platform content with external fallbacks (YouTube, Coursera)
+- **Your Learning Paths**: Save and track your AI-generated curricula
 
 ### 📁 My Drive
 - **Personal Storage**: Organize and manage uploaded resources efficiently
@@ -101,7 +108,7 @@ frontend/
 │   │   ├── quiz/               # Quiz components
 │   │   └── ui/                 # Base UI components
 │   ├── constants/              # App constants and configurations
-│   ├── data/                   # Static data and mock content
+│   ├── data/                   # Static data, learning paths, demo content
 │   ├── pages/                  # Page components
 │   │   ├── admin/              # Admin dashboard pages
 │   │   ├── ai/                 # AI assistant pages
@@ -110,6 +117,7 @@ frontend/
 │   │   ├── drive/              # My Drive pages
 │   │   ├── hub/                # Learning hub explorer
 │   │   ├── quiz/               # Quiz creation pages
+│   │   ├── curriculum/         # Learning paths and curriculum generation
 │   │   └── user/               # User dashboard and profile
 │   ├── services/               # API and business logic services
 │   │   ├── admin/              # Admin API services
@@ -119,6 +127,7 @@ frontend/
 │   │   ├── download/           # Download handling
 │   │   ├── drive/              # Drive services
 │   │   ├── quiz/               # Quiz services
+│   │   ├── curriculum/         # Curriculum generation and resource mapping
 │   │   ├── storage/            # Local storage services
 │   │   └── user/               # User management services
 │   ├── types/                  # TypeScript type definitions
@@ -203,8 +212,9 @@ npm run preview
 | `/profile` | User Profile | Yes |
 | `/quiz/create` | Quiz Creator | Yes |
 | `/notes/upload` | Upload Notes | Yes |
-| `/subscriptions` | Subscriptions | Yes |
-| `/contribute` | Contribution Page | Yes |
+| `/learning-paths` | Browse Learning Paths | No |
+| `/curriculum/generate` | Generate AI Curriculum | Yes |
+| `/curriculum/:id` | View Generated Curriculum | Yes |
 | `/admin/login` | Admin Login | No |
 | `/admin/dashboard` | Admin Dashboard | Admin Only |
 
@@ -262,7 +272,6 @@ vercel
 ## 📄 Related Links
 
 - **Backend Repository**: [OpenLearn-Hub Backend](../backend/README.md)
-- **Live Demo**: [Coming Soon]
 
 ---
 

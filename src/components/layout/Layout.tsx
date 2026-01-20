@@ -19,7 +19,8 @@ import {
   Compass,
   HardDrive,
   TrendingUp,
-  Users
+  Users,
+  GraduationCap
 } from 'lucide-react';
 import { authService } from '@/services/auth/authService';
 import { AuthRequiredModal } from '@/components/modals/AuthRequiredModal';
@@ -119,6 +120,9 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             <NavItem to="/my-drive" icon={<HardDrive size={20} />} label="My Drive" active={location.pathname === '/my-drive'} />
             <NavItem to="/browse" icon={<Compass size={20} />} label="Browse Paths" active={location.pathname === '/browse'} />
             <NavItem to="/leaderboard" icon={<Award size={20} />} label="Contributors" active={location.pathname === '/leaderboard'} />
+
+            {/* Learning Paths - Accessible to all */}
+            <NavItem to="/learning-paths" icon={<GraduationCap size={20} />} label="Learning Paths" active={location.pathname.startsWith('/learning-paths') || location.pathname.startsWith('/curriculum')} />
 
             {/* Restricted features - require auth */}
             {user ? (

@@ -23,6 +23,9 @@ import { ContributionPage } from '@/pages/user/ContributionPage';
 import { SubscriptionsPage } from '@/pages/user/SubscriptionsPage';
 import { AdminLoginPage } from '@/pages/admin/AdminLoginPage';
 import { AdminDashboard } from '@/pages/admin/AdminDashboard';
+import { CurriculumGeneratorPage } from '@/pages/curriculum/CurriculumGeneratorPage';
+import { CurriculumResultPage } from '@/pages/curriculum/CurriculumResultPage';
+import { LearningPathsPage } from '@/pages/curriculum/LearningPathsPage';
 import { authService } from '@/services/auth/authService';
 
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -109,6 +112,7 @@ const App: React.FC = () => {
               {/* Browse - Accessible to guests */}
               <Route path="/browse" element={<BrowseByPathPage />} />
               <Route path="/trending" element={<TrendingNotesPage />} />
+              <Route path="/learning-paths" element={<LearningPathsPage />} />
               <Route path="/note/:noteId" element={<SharedNotePage />} />
 
               {/* Subscriptions - Requires authentication */}
@@ -121,6 +125,18 @@ const App: React.FC = () => {
               <Route path="/contribute" element={
                 <PrivateRoute>
                   <ContributionPage />
+                </PrivateRoute>
+              } />
+
+              {/* Curriculum Routes - Require authentication */}
+              <Route path="/curriculum/generate" element={
+                <PrivateRoute>
+                  <CurriculumGeneratorPage />
+                </PrivateRoute>
+              } />
+              <Route path="/curriculum/:id" element={
+                <PrivateRoute>
+                  <CurriculumResultPage />
                 </PrivateRoute>
               } />
               <Route path="/leaderboard" element={<div className="p-8"><h1 className="text-3xl font-bold">Top Contributors Coming Soon</h1></div>} />
