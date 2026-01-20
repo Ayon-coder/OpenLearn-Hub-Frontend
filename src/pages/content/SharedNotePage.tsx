@@ -6,13 +6,17 @@ import { authService } from '@/services/auth/authService';
 import { driveSyncService } from '@/services/drive/driveSyncService';
 import { Subject, Topic, Subtopic, Difficulty } from '@/types';
 import { Toast, ToastType } from '@/components/ui/Toast';
+import axios from 'axios';
 
-import { DEMO_CONTENTS } from '@/data/demoContents';
+import { DEMO_CONTENTS, DemoContent } from '@/data/demoContents';
+
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
 export const SharedNotePage: React.FC = () => {
     const { noteId } = useParams<{ noteId: string }>();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
+    const [foundContent, setFoundContent] = useState<DemoContent | null>(null);
     const user = authService.getUser();
 
     // Toast State
@@ -31,9 +35,34 @@ export const SharedNotePage: React.FC = () => {
     };
 
     useEffect(() => {
-        // Simulate loading
-        setTimeout(() => setLoading(false), 1000);
-    }, []);
+        const loadContent = async () => {
+            setLoading(true);
+
+            // First try to find in static DEMO_CONTENTS
+            const staticContent = DEMO_CONTENTS.find(c => c.id === noteId);
+            if (staticContent) {
+                setFoundContent(staticContent);
+                setLoading(false);
+                return;
+            }
+
+            // If not found, fetch from backend global content
+            try {
+                const response = await axios.get(`${API_BASE_URL}/api/storage/global`);
+                const globalContents: DemoContent[] = response.data || [];
+                const backendContent = globalContents.find(c => c.id === noteId);
+                if (backendContent) {
+                    setFoundContent(backendContent);
+                }
+            } catch (err) {
+                console.error('Failed to fetch global content:', err);
+            }
+
+            setLoading(false);
+        };
+
+        loadContent();
+    }, [noteId]);
 
     if (loading) {
         return (
@@ -43,15 +72,32 @@ export const SharedNotePage: React.FC = () => {
         );
     }
 
-    // Find the actual demo content
-    const foundContent = DEMO_CONTENTS.find(c => c.id === noteId);
-
     // Default fallback if not found or for the body text (since demo data doesn't have full text)
+    // Priority: 1. uploadedBy name, 2. lookup from uploaderEmail, 3. fallback to noteId
+    const getAuthorName = () => {
+        // If we have uploadedBy and it's not empty, use it
+        if (foundContent?.uploadedBy && foundContent.uploadedBy.trim() !== '') {
+            return foundContent.uploadedBy;
+        }
+        // If we have uploaderEmail, we could fetch name from backend
+        // For now, extract a clean fallback from email
+        if (foundContent?.uploaderEmail) {
+            const emailPrefix = foundContent.uploaderEmail.split('@')[0];
+            // Capitalize first letter and clean up
+            return emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1).replace(/[._]/g, ' ');
+        }
+        // Ultimate fallback
+        return noteId ? `User_${noteId.slice(-4)}` : "Anonymous";
+    };
+
+    const authorName = getAuthorName();
+
     const noteData = {
         title: foundContent?.title || "Understanding Process Synchronization",
-        author: foundContent?.uploadedBy || "User_" + noteId?.slice(-4) || "Anonymous",
-        subject: foundContent?.organization.subjectPath?.subject || "Computer Science",
-        topic: foundContent?.organization.subjectPath?.coreTopic || "Operating Systems",
+        author: authorName,
+        uploaderEmail: foundContent?.uploaderEmail || null,
+        subject: foundContent?.organization?.subjectPath?.subject || "Computer Science",
+        topic: foundContent?.organization?.subjectPath?.coreTopic || "Operating Systems",
         uploadedAt: foundContent?.uploadedAt ? new Date(foundContent.uploadedAt).toLocaleDateString() : "Just now",
         content: foundContent ? `
 ## Description

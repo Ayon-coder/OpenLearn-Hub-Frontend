@@ -40,6 +40,18 @@ export interface MatchingCriteria {
     domain: string;
     exam_context: string;
     alternative_names?: string[];
+    // Added by backend validation
+    validation_status?: 'available' | 'alternative' | 'external_platform_fallback' | 'verified';
+    matched_content_id?: string;
+    matched_content_title?: string;
+    content_url?: string;
+    original_id?: string;
+    note?: string;
+    external_links?: Array<{
+        platform: string;
+        url: string;
+        icon?: string;
+    }>;
 }
 
 export interface PracticeProblem {
@@ -270,13 +282,13 @@ export const curriculumService = {
     /**
      * Get a specific curriculum by ID
      */
-    async getById(curriculumId: string): Promise<SavedCurriculum | null> {
+    async getById(userId: string, curriculumId: string): Promise<SavedCurriculum | null> {
         // Try cache first
         const cached = getFromCache<SavedCurriculum>(`curriculum_${curriculumId}`);
         if (cached) return cached;
 
         try {
-            const response = await fetch(`${API_BASE}/${curriculumId}`);
+            const response = await fetch(`${API_BASE}/${userId}/${curriculumId}`);
             const result = await response.json();
 
             if (!response.ok) {
@@ -352,6 +364,7 @@ export const curriculumService = {
      */
     async updateProgress(
         curriculumId: string,
+        userId: string,
         progress: Record<string, any>
     ): Promise<SavedCurriculum | null> {
         try {
@@ -360,7 +373,7 @@ export const curriculumService = {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ progress })
+                body: JSON.stringify({ progress, userId })
             });
 
             const result = await response.json();
@@ -370,16 +383,11 @@ export const curriculumService = {
                 return null;
             }
 
-            // Invalidate or update cache
-            // For simplicity, we invalidate to force refresh on next specific fetch
+            // Invalidate caches
             invalidateCache(`curriculum_${curriculumId}`);
-            // Also invalidate user list as it might show progress
-            // Note: We'd need the userId to invalidate the list safely, 
-            // but since we don't have it here easily and it's less critical for list view details usually
-            // we will skip list invalidation or we can partially update if desired.
-            // A clearer strategy is to just invalidate the specific item.
+            invalidateCache(`user_curricula_${userId}`);
 
-            // To update cache immediately:
+            // Update cache immediately:
             saveToCache(`curriculum_${curriculumId}`, result.curriculum);
 
             return result.curriculum;

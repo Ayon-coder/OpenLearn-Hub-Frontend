@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { UserPlus, UserCheck } from 'lucide-react';
 import { subscriptionService } from '@/services/user/subscriptionService';
-import { authService } from '@/services/auth/authService';
+import { useAuth } from '@/hooks/useAuth';
+import { useUserStorage } from '@/hooks/useUserStorage';
 
 interface FollowButtonProps {
     creatorId: string;
@@ -16,28 +17,17 @@ export const FollowButton: React.FC<FollowButtonProps> = ({
     variant = 'default',
     onFollowChange
 }) => {
-    const [isFollowing, setIsFollowing] = useState(false);
+    const { profile, updateSubscriptions } = useUserStorage();
+    const { user } = useAuth(); // We still need user for auth check
     const [isLoading, setIsLoading] = useState(false);
-    const user = authService.getUser();
 
-    useEffect(() => {
-        if (user) {
-            setIsFollowing(subscriptionService.isFollowing(user.id, creatorId));
-        }
-    }, [user, creatorId]);
+    // Derive isFollowing from profile
+    const isFollowing = React.useMemo(() => {
+        if (!profile || !profile.subscriptions) return false;
+        return subscriptionService.isFollowing(profile.subscriptions, creatorId);
+    }, [profile, creatorId]);
 
-    useEffect(() => {
-        const handleSubscriptionChange = () => {
-            if (user) {
-                setIsFollowing(subscriptionService.isFollowing(user.id, creatorId));
-            }
-        };
-
-        window.addEventListener('subscription-change', handleSubscriptionChange);
-        return () => window.removeEventListener('subscription-change', handleSubscriptionChange);
-    }, [user, creatorId]);
-
-    const handleClick = (e: React.MouseEvent) => {
+    const handleClick = async (e: React.MouseEvent) => {
         e.stopPropagation();
 
         if (!user) {
@@ -46,20 +36,31 @@ export const FollowButton: React.FC<FollowButtonProps> = ({
             return;
         }
 
+        if (!profile) return;
+
         setIsLoading(true);
 
-        setTimeout(() => {
+        try {
+            let newSubscriptions = [...(profile.subscriptions || [])];
+
             if (isFollowing) {
-                subscriptionService.unfollowCreator(user.id, creatorId);
-                setIsFollowing(false);
+                // Unfollow logic
+                newSubscriptions = newSubscriptions.filter(sub => sub.creatorId !== creatorId);
                 onFollowChange?.(false);
             } else {
-                subscriptionService.followCreator(user.id, creatorId);
-                setIsFollowing(true);
+                // Follow logic
+                const newSub = subscriptionService.createSubscription(user.id, creatorId);
+                newSubscriptions.push(newSub);
                 onFollowChange?.(true);
             }
+
+            await updateSubscriptions(newSubscriptions);
+        } catch (error) {
+            console.error("Failed to update subscription", error);
+            // Ideally revert UI state or show toast
+        } finally {
             setIsLoading(false);
-        }, 200);
+        }
     };
 
     if (variant === 'compact') {
@@ -68,8 +69,8 @@ export const FollowButton: React.FC<FollowButtonProps> = ({
                 onClick={handleClick}
                 disabled={isLoading}
                 className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-bold text-sm transition-all ${isFollowing
-                        ? 'bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200'
-                        : 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm'
+                    ? 'bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200'
+                    : 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm'
                     } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
                 {isFollowing ? (
@@ -92,8 +93,8 @@ export const FollowButton: React.FC<FollowButtonProps> = ({
             onClick={handleClick}
             disabled={isLoading}
             className={`flex items-center space-x-2 px-6 py-3 rounded-2xl font-black transition-all ${isFollowing
-                    ? 'bg-gray-100 text-gray-600 border-2 border-gray-200 hover:bg-gray-200'
-                    : 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl'
+                ? 'bg-gray-100 text-gray-600 border-2 border-gray-200 hover:bg-gray-200'
+                : 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl'
                 } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
             {isFollowing ? (

@@ -3,6 +3,7 @@ import { BookOpen, GraduationCap, Youtube, Eye, ThumbsUp, MessageSquare, Star, D
 import { DemoContent } from '@/data/demoContents';
 import { FollowButton } from '@/components/ui/FollowButton';
 import { subscriptionService } from '@/services/user/subscriptionService';
+import { useAuth } from '@/hooks/useAuth';
 import { VideoPlayer } from './VideoPlayer';
 
 interface EnhancedContentCardProps {
@@ -22,6 +23,8 @@ export const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
     }
 
     const { title, description, organization, uploadedBy = 'Anonymous', views, likes } = content;
+    const { user } = useAuth();
+
     // Safe access to organization properties
     const subjectPath = organization.subjectPath;
     const universityPath = organization.universityPath;
@@ -259,8 +262,8 @@ export const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
                         <span className="font-medium underline decoration-dotted underline-offset-2 truncate max-w-[120px]">{uploadedBy}</span>
                     </div>
 
-                    {/* Follow Button - show for all creators */}
-                    {creator && (
+                    {/* Follow Button - show for all creators EXCEPT self */}
+                    {creator && (!user || user.name !== uploadedBy) && (
                         <div onClick={(e) => e.stopPropagation()}>
                             <FollowButton
                                 creatorId={creator.id}

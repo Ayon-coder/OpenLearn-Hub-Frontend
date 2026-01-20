@@ -10,7 +10,8 @@ import {
     GraduationCap,
     ShieldCheck
 } from 'lucide-react';
-import { DEMO_CONTENTS, DemoContent } from '@/data/demoContents';
+import { DemoContent } from '@/data/demoContents';
+import { useGlobalContent } from '@/hooks/useGlobalContent';
 import { EnhancedContentCard } from '@/components/content/EnhancedContentCard';
 import { CourseGatekeeperModal } from '@/components/modals/CourseGatekeeperModal';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
@@ -20,6 +21,8 @@ type SortType = 'recent' | 'popular' | 'rating' | 'downloads';
 
 export const TrendingNotesPage: React.FC = () => {
     const navigate = useNavigate();
+    const { contents: contentList, loading, error } = useGlobalContent(); // Fetch from backend
+
     const [activeTab, setActiveTab] = useState<TabType>('community');
     const [sortFilter, setSortFilter] = useState<SortType>('recent');
     const [selectedTag, setSelectedTag] = useState<string>('All');
@@ -31,9 +34,6 @@ export const TrendingNotesPage: React.FC = () => {
     // Gatekeeper modal state
     const [gatekeeperOpen, setGatekeeperOpen] = useState(false);
     const [selectedGatedContent, setSelectedGatedContent] = useState<DemoContent | null>(null);
-
-    // Use DEMO_CONTENTS directly - it is initialized from localStorage at module level
-    const contentList = DEMO_CONTENTS;
 
     // Close dropdown on navigation/click outside
     useEffect(() => {
@@ -100,6 +100,35 @@ export const TrendingNotesPage: React.FC = () => {
         }
         return 0;
     };
+
+    // Show loading state
+    if (loading) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[500px] space-y-4">
+                <div className="w-12 h-12 border-4 border-violet-200 border-t-violet-600 rounded-full animate-spin"></div>
+                <p className="text-gray-500 font-medium animate-pulse">Loading trending notes...</p>
+            </div>
+        );
+    }
+
+    // Show error state
+    if (error) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] text-center p-8 bg-red-50 rounded-3xl border border-red-100">
+                <div className="text-red-500 mb-4">
+                    <ShieldCheck size={48} className="mx-auto text-red-400" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Unable to load content</h3>
+                <p className="text-gray-600 mb-6 max-w-md">{error}</p>
+                <button
+                    onClick={() => window.location.reload()}
+                    className="px-6 py-2 bg-white border border-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-50 transition-colors shadow-sm"
+                >
+                    Try Again
+                </button>
+            </div>
+        );
+    }
 
     const displayedContent = contentList
         .filter(filterContent)

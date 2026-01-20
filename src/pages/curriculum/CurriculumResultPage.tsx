@@ -13,97 +13,67 @@ import { DEMO_CONTENTS, DemoContent } from '@/data/demoContents';
 
 
 
-// Helper to find matching platform content - ROBUST & GENERIC & LEVEL-AWARE & SLUG-AWARE
+// Helper to find matching platform content - USES BACKEND VALIDATION FIRST
 function findPlatformContent(topics: string[], title: string, level?: string, matchingCriteria?: any): DemoContent[] {
-    // 1. Define Stop Words (Generic words that shouldn't trigger a match)
-    const STOP_WORDS = new Set([
-        'and', 'or', 'the', 'a', 'an', 'in', 'on', 'at', 'to', 'for', 'of', 'with',
-        'introduction', 'intro', 'basics', 'basic', 'advanced', 'complete', 'guide',
-        'tutorial', 'course', 'learn', 'how', 'what', 'why',
-        'development', 'design', 'engineering', 'science', 'scratch', 'zero', 'hero',
-        'mastery', 'bootcamp', 'full', 'stack', 'concepts', 'principles',
-        'implementation', 'application', 'applications', 'examples', 'topic', 'model'
-    ]);
-
-    // 2. Helper to extract meaningful keywords
-    const getKeywords = (text: string[]) => {
-        return text.join(' ').toLowerCase()
-            .replace(/-/g, ' ') // Handle hyphens in slugs
-            .replace(/[^a-z0-9\s]/g, '') // Remove special chars
-            .split(/\s+/) // Split by whitespace
-            .filter(w => w.length > 2 && !STOP_WORDS.has(w)); // Filter small words & stop words
-    };
-
-    // 3. Extract keywords from the Course we are looking for
-    // If we have specific matching criteria (New System), use that first!
-    let courseKeywords: Set<string>;
-    if (matchingCriteria) {
-        // Priority 1: Use specific slugs and keywords from AI
-        // Use explicit array for slugs
-        const slugs = [matchingCriteria.topic_slug, ...(matchingCriteria.subtopic_slugs || [])];
-        const criteriaKeywords = matchingCriteria.keywords || [];
-        // Extract keywords from slugs too
-        const slugKeywords = getKeywords(slugs);
-        courseKeywords = new Set([...slugKeywords, ...criteriaKeywords, ...getKeywords([title])]);
-
-        // Add variations if available
-        if (matchingCriteria.alternative_names) {
-            matchingCriteria.alternative_names.forEach((name: any) => {
-                getKeywords([name]).forEach(k => courseKeywords.add(k));
-            });
+    // PRIORITY 1: If backend already matched content, use that directly!
+    if (matchingCriteria?.matched_content_id) {
+        const matchedContent = DEMO_CONTENTS.find(c => c.id === matchingCriteria.matched_content_id);
+        if (matchedContent) {
+            return [matchedContent];
         }
-    } else {
-        // Fallback: Legacy topic matching
-        courseKeywords = new Set(getKeywords([title, ...topics]));
     }
 
-    // 4. Score content based on keyword intersection
-    const scoredContent = DEMO_CONTENTS.map(content => {
-        let score = 0;
-
-        // Get content keywords (Title + Tags)
-        const contentKeywords = getKeywords([content.title, ...(content.tags || [])]);
-
-        // Count matches
-        let matches = 0;
-        contentKeywords.forEach(word => {
-            if (courseKeywords.has(word)) {
-                matches++;
-                score += 10; // Base score for keyword match
-            }
-        });
-
-        // Boost for Exact Phrase Matches in Title
-        const contentTitleLower = content.title.toLowerCase();
-        const courseTitleLower = title.toLowerCase();
-        if (contentTitleLower.includes(courseTitleLower) || courseTitleLower.includes(contentTitleLower)) {
-            score += 20;
-        }
-
-        // LEVEL MATCHING (Important!)
-        // Boost if content level matches the requested course level
-        // CRITICAL FIX: Only apply level boost if we have at least one keyword match!
-        if (matches > 0 && level && content.level && level.toLowerCase() === content.level.toLowerCase()) {
-            score += 15; // Significant boost for correct level
-        }
-
-        // DOMAIN/EXAM CONTEXT MATCHING (New System)
-        if (matchingCriteria && matchingCriteria.exam_context && matchingCriteria.exam_context !== 'none') {
-            // Check for exam context in tags (e.g., 'gate', 'neet', 'aws')
-            if (content.tags && content.tags.includes(matchingCriteria.exam_context)) {
-                score += 50; // MASSIVE BOOST for matching exam context
+    // PRIORITY 2: If backend marked as "available" with content_url, try to extract ID
+    if (matchingCriteria?.validation_status === 'available' && matchingCriteria?.content_url) {
+        const urlMatch = matchingCriteria.content_url.match(/\/notes?\/([^/]+)$/);
+        if (urlMatch) {
+            const contentId = urlMatch[1];
+            const matchedContent = DEMO_CONTENTS.find(c => c.id === contentId);
+            if (matchedContent) {
+                return [matchedContent];
             }
         }
+    }
 
-        return { content, score, matches };
+    // PRIORITY 3: If backend marked as "alternative", return empty (let UI show external resources)
+    if (matchingCriteria?.validation_status === 'alternative' ||
+        matchingCriteria?.validation_status === 'external_platform_fallback') {
+        return [];
+    }
+
+    // FALLBACK: Strict title-based matching (old curricula without new validation)
+    // Only match if title is VERY similar (not just keyword overlap)
+    const courseTitleLower = title.toLowerCase().trim();
+
+    const exactMatches = DEMO_CONTENTS.filter(content => {
+        const contentTitleLower = content.title.toLowerCase().trim();
+
+        // Exact match
+        if (contentTitleLower === courseTitleLower) return true;
+
+        // One contains the other (but must be significant portion)
+        const shorter = contentTitleLower.length < courseTitleLower.length ? contentTitleLower : courseTitleLower;
+        const longer = contentTitleLower.length >= courseTitleLower.length ? contentTitleLower : courseTitleLower;
+
+        // Must be at least 60% of the longer title
+        if (longer.includes(shorter) && shorter.length / longer.length > 0.6) {
+            return true;
+        }
+
+        return false;
     });
 
-    // 5. Threshold: Require at least 15 points (stricter match)
-    return scoredContent
-        .filter(item => item.score >= 15)
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 2)
-        .map(item => item.content);
+    // If we found strict matches, return them
+    if (exactMatches.length > 0) {
+        // Filter by level if available
+        const levelFiltered = level
+            ? exactMatches.filter(c => c.level?.toLowerCase() === level.toLowerCase())
+            : exactMatches;
+        return levelFiltered.length > 0 ? levelFiltered.slice(0, 1) : exactMatches.slice(0, 1);
+    }
+
+    // No match found - return empty, let UI show external resources
+    return [];
 }
 
 // Generate external resource suggestions based on course topic
@@ -219,14 +189,17 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, tierColor, level }) => 
                             <span>Learning Materials</span>
                         </h5>
 
-                        {/* Platform Content */}
+                        {/* Check validation_status from matching_criteria */}
                         {(() => {
-                            const platformContent = findPlatformContent(course.topics || [], course.title, level, course.matching_criteria);
-                            const externalResources = generateExternalResources(course);
+                            const validationStatus = course.matching_criteria?.validation_status;
+                            const isAlternative = validationStatus === 'alternative' || validationStatus === 'external_platform_fallback';
 
-                            return (
-                                <div className="space-y-4">
-                                    {platformContent.length > 0 && (
+                            // For AVAILABLE content - show platform content
+                            if (!isAlternative) {
+                                const platformContent = findPlatformContent(course.topics || [], course.title, level, course.matching_criteria);
+
+                                if (platformContent.length > 0) {
+                                    return (
                                         <div className="space-y-3">
                                             {platformContent.map((content) => (
                                                 <a
@@ -234,26 +207,17 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, tierColor, level }) => 
                                                     href={`#/note/${content.id}`}
                                                     className="group relative block bg-gradient-to-br from-white via-blue-50/30 to-purple-50/30 rounded-2xl border border-gray-100 p-5 hover:shadow-2xl hover:shadow-blue-200/50 transition-all duration-300 overflow-hidden transform hover:-translate-y-1"
                                                 >
-                                                    {/* Animated gradient border */}
                                                     <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ padding: '2px', mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)', maskComposite: 'exclude' }} />
-
                                                     <div className="relative flex items-center justify-between">
                                                         <div className="flex-1">
-                                                            {/* Badge */}
                                                             <div className="inline-flex items-center space-x-1 px-3 py-1.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl text-xs font-black shadow-lg shadow-green-200/50 mb-3">
                                                                 <CheckCircle2 size={12} />
-                                                                <span>On Platform</span>
+                                                                <span>Available on Platform</span>
                                                             </div>
-
-                                                            {/* Title */}
                                                             <h6 className="font-black text-gray-900 text-lg group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 transition-all duration-300">
                                                                 {content.title}
                                                             </h6>
-
-                                                            {/* Description */}
                                                             <p className="text-sm text-gray-500 line-clamp-1 mt-1">{content.description}</p>
-
-                                                            {/* Stats */}
                                                             <div className="flex items-center space-x-4 mt-3">
                                                                 <div className="flex items-center space-x-1.5 text-sm text-gray-500">
                                                                     <div className="p-1 bg-blue-100 rounded-lg">
@@ -264,60 +228,71 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, tierColor, level }) => 
                                                                 <span className="text-sm text-gray-400">by <span className="font-medium text-gray-600">{content.uploadedBy}</span></span>
                                                             </div>
                                                         </div>
-
-                                                        {/* Play button with glow */}
                                                         <div className="relative ml-5">
                                                             <div className="p-4 bg-gradient-to-br from-blue-500 via-blue-600 to-purple-600 rounded-2xl shadow-lg shadow-blue-300/50 group-hover:shadow-blue-400/70 group-hover:scale-110 transition-all duration-300">
                                                                 <Play size={24} className="text-white" fill="white" />
                                                             </div>
-                                                            {/* Glow effect */}
                                                             <div className="absolute inset-0 bg-blue-500 blur-xl opacity-0 group-hover:opacity-40 transition-opacity duration-300 rounded-2xl" />
                                                         </div>
                                                     </div>
                                                 </a>
                                             ))}
                                         </div>
-                                    )}
+                                    );
+                                }
+                            }
 
-                                    {/* External Resources */}
-                                    <div className="pt-3">
-                                        <p className="text-xs font-bold text-gray-400 mb-3 flex items-center space-x-1">
-                                            <Link size={12} />
-                                            <span>External Resources</span>
-                                        </p>
-                                        <div className="grid grid-cols-2 gap-3">
-                                            {externalResources.map((resource, i) => (
-                                                <a
-                                                    key={i}
-                                                    href={resource.url}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="group flex items-center space-x-3 p-4 bg-white rounded-2xl border border-gray-100 hover:shadow-xl hover:border-transparent transition-all duration-300 overflow-hidden relative"
-                                                >
-                                                    {/* Hover gradient */}
-                                                    <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${resource.platform === 'YouTube'
-                                                        ? 'bg-gradient-to-br from-red-50 to-orange-50'
-                                                        : 'bg-gradient-to-br from-green-50 to-emerald-50'
-                                                        }`} />
+                            // For ALTERNATIVE content - show external resources with clear badge
+                            const externalLinks = course.matching_criteria?.external_links || [];
+                            const defaultExternalResources = generateExternalResources(course);
 
-                                                    <div className={`relative p-3 rounded-xl shadow-sm transition-all duration-300 group-hover:scale-110 ${resource.platform === 'YouTube'
-                                                        ? 'bg-gradient-to-br from-red-500 to-orange-500'
-                                                        : 'bg-gradient-to-br from-green-500 to-emerald-500'
-                                                        }`}>
-                                                        {resource.platform === 'YouTube' ? (
-                                                            <Youtube size={18} className="text-white" />
-                                                        ) : (
-                                                            <Code size={18} className="text-white" />
-                                                        )}
-                                                    </div>
-                                                    <div className="relative flex-1 min-w-0">
-                                                        <p className="text-sm font-bold text-gray-700 truncate group-hover:text-gray-900">{resource.platform}</p>
-                                                        <p className="text-xs text-gray-400 truncate">Search tutorials</p>
-                                                    </div>
-                                                    <ExternalLink size={16} className="relative text-gray-300 group-hover:text-blue-500 transition-colors" />
-                                                </a>
-                                            ))}
+                            return (
+                                <div className="space-y-4">
+                                    {/* Alternative Path Badge */}
+                                    <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-4">
+                                        <div className="flex items-start space-x-3">
+                                            <div className="p-2 bg-amber-100 rounded-xl">
+                                                <AlertCircle size={20} className="text-amber-600" />
+                                            </div>
+                                            <div>
+                                                <h6 className="font-bold text-amber-800 text-sm">Alternative Learning Path</h6>
+                                                <p className="text-amber-600 text-xs mt-1">
+                                                    This topic isn't available on our platform yet. Here are recommended external resources:
+                                                </p>
+                                            </div>
                                         </div>
+                                    </div>
+
+                                    {/* External Resources Grid */}
+                                    <div className="grid grid-cols-3 gap-3">
+                                        {(externalLinks.length > 0 ? externalLinks : defaultExternalResources).map((resource: any, i: number) => (
+                                            <a
+                                                key={i}
+                                                href={resource.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="group flex flex-col items-center justify-center p-4 bg-white rounded-2xl border border-gray-100 hover:shadow-xl hover:border-transparent transition-all duration-300 overflow-hidden relative"
+                                            >
+                                                <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${resource.platform === 'YouTube' ? 'bg-gradient-to-br from-red-50 to-orange-50' :
+                                                    resource.platform === 'Coursera' ? 'bg-gradient-to-br from-blue-50 to-indigo-50' :
+                                                        'bg-gradient-to-br from-green-50 to-emerald-50'
+                                                    }`} />
+                                                <div className={`relative p-3 rounded-xl shadow-sm transition-all duration-300 group-hover:scale-110 ${resource.platform === 'YouTube' ? 'bg-gradient-to-br from-red-500 to-orange-500' :
+                                                    resource.platform === 'Coursera' ? 'bg-gradient-to-br from-blue-500 to-indigo-500' :
+                                                        'bg-gradient-to-br from-green-500 to-emerald-500'
+                                                    }`}>
+                                                    {resource.platform === 'YouTube' ? (
+                                                        <Youtube size={20} className="text-white" />
+                                                    ) : resource.platform === 'Coursera' ? (
+                                                        <GraduationCap size={20} className="text-white" />
+                                                    ) : (
+                                                        <Code size={20} className="text-white" />
+                                                    )}
+                                                </div>
+                                                <p className="relative text-sm font-bold text-gray-700 mt-2 group-hover:text-gray-900">{resource.platform}</p>
+                                                <ExternalLink size={12} className="relative text-gray-300 mt-1 group-hover:text-blue-500 transition-colors" />
+                                            </a>
+                                        ))}
                                     </div>
                                 </div>
                             );
@@ -465,7 +440,7 @@ export const CurriculumResultPage: React.FC = () => {
             }
 
             try {
-                const data = await curriculumService.getById(id);
+                const data = await curriculumService.getById(currentUser.id, id);
                 if (!data) {
                     setError('Curriculum not found');
                 } else {

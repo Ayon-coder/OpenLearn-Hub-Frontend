@@ -19,22 +19,25 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { authService } from '@/services/auth/authService';
-import { driveSyncService } from '@/services/drive/driveSyncService';
 import { TrustLevelIndicator } from '@/components/ui/TrustLevelIndicator';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import { useUserStorage } from '@/hooks/useUserStorage';
 
 export const ProfilePage: React.FC = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState(authService.getUser());
-  const [driveItems, setDriveItems] = useState(driveSyncService.getDriveItems());
+  const { user } = useAuth(); // Use reactive user from hook
+  const { profile, loading: profileLoading } = useUserStorage();
+
   const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState(user?.name || '');
 
+  // Sync local name state when user updates
   useEffect(() => {
-    const handleAuth = () => setUser(authService.getUser());
-    window.addEventListener('auth-change', handleAuth);
-    return () => window.removeEventListener('auth-change', handleAuth);
-  }, []);
+    if (user) {
+      setNewName(user.name);
+    }
+  }, [user]);
 
   const handleLogout = () => {
     authService.logout();
@@ -42,14 +45,49 @@ export const ProfilePage: React.FC = () => {
   };
 
   const handleSaveProfile = () => {
+    // Note: This still updates local auth state only.
+    // Ideally we would sync this to GitHub profile too if we move identity there.
     authService.updateProfile({ name: newName });
     setIsEditing(false);
   };
 
   if (!user) return null;
 
-  const uploadedCount = driveItems.filter(i => i.source === 'Uploaded').length;
-  const downloadedCount = driveItems.filter(i => i.source === 'Downloaded').length;
+  // Derive drive items from profile
+  const driveItems = React.useMemo(() => {
+    if (!profile) return [];
+
+    const uploads = (profile.uploads || []).map(u => ({
+      id: u.id,
+      name: u.title,
+      timestamp: new Date(u.uploadedAt).toLocaleDateString(),
+      subjectName: u.organization?.subjectPath?.subject || 'General',
+      source: 'Uploaded' as const
+    }));
+
+    const downloads = (profile.downloads || []).map(d => ({
+      id: d.id,
+      name: d.title,
+      timestamp: new Date(d.uploadedAt).toLocaleDateString(),
+      subjectName: d.organization?.subjectPath?.subject || 'General',
+      source: 'Downloaded' as const
+    }));
+
+    return [...uploads, ...downloads].sort((a, b) =>
+      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    );
+  }, [profile]);
+
+  const uploadedCount = profile?.uploads?.length || 0;
+  const downloadedCount = profile?.downloads?.length || 0;
+
+  if (profileLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-6 duration-700 max-w-6xl mx-auto pb-24">
@@ -243,13 +281,13 @@ export const ProfilePage: React.FC = () => {
             </div>
             <div className="divide-y divide-gray-50">
               {driveItems.slice(0, 5).map((item) => (
-                <div key={item.id} className="p-8 hover:bg-gray-50 transition-all flex items-center justify-between group">
+                <div key={item.id} className="p-8 hover:bg-gray-50 transition-all flex items-center justify-center sm:justify-between group flex-wrap gap-4">
                   <div className="flex items-center space-x-6">
                     <div className={`p-4 rounded-2xl ${item.source === 'Uploaded' ? 'bg-indigo-50 text-indigo-600' : 'bg-blue-50 text-blue-600'} group-hover:scale-110 transition-transform`}>
                       <Database size={20} />
                     </div>
                     <div>
-                      <h4 className="font-black text-gray-900 group-hover:text-blue-600 transition-colors">{item.name}</h4>
+                      <h4 className="font-black text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-1">{item.name}</h4>
                       <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mt-1 flex items-center">
                         <Clock size={12} className="mr-1.5" /> {item.timestamp} • {item.subjectName}
                       </p>

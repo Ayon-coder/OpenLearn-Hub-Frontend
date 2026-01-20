@@ -8,8 +8,7 @@ import { CourseUploadForm } from '@/components/forms/upload/CourseUploadForm';
 import { ShareableLink } from '@/components/ui/ShareableLink';
 import { UploadWizard } from '@/components/forms/upload/UploadWizard';
 import { UploadedDocument } from '@/types';
-import { addDemoContent, DEMO_CONTENTS } from '@/data/demoContents';
-import { driveSyncService } from '@/services/drive/driveSyncService';
+import { useUserStorage } from '@/hooks/useUserStorage';
 
 export const NoteUploadPage: React.FC = () => {
     const navigate = useNavigate();
@@ -112,29 +111,56 @@ export const NoteUploadPage: React.FC = () => {
 
     const [isGenerating, setIsGenerating] = useState(false);
 
+    const { addToUploads } = useUserStorage();
+
     const handleCommunityWizardComplete = async (data: any) => {
         setIsGenerating(true);
+        const noteId = `community_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+        // Construct community content object
+        const newContent: any = {
+            id: noteId,
+            title: data.title || 'Untitled Note',
+            description: 'Community Contribution',
+            organization: {
+                primaryPath: 'subject', // Default for community
+                subjectPath: {
+                    subject: 'Community',
+                    coreTopic: 'General',
+                    subtopic: 'Uploads',
+                    resourceTitle: data.title || 'Untitled Note'
+                }
+            },
+            uploadedBy: user.name,
+            uploaderEmail: user.email, // Store email for reliable name lookup
+            uploadedAt: new Date().toISOString(),
+            views: 0, likes: 0, downloads: 0,
+            tags: ['Community', 'Upload'],
+            level: 'Beginner'
+        };
+
+        // Save to user profile
+        await addToUploads(newContent);
+
         // Simulate network delay for "generation" effect
         await new Promise(resolve => setTimeout(resolve, 1500));
 
         // data.title has the title from the wizard
         setNoteTitle(data.title || 'Untitled Note');
-        const noteId = `community_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         setGeneratedNoteId(noteId);
 
         setIsGenerating(false);
         setUploadComplete(true);
     };
 
-    const handleCourseUploadComplete = (data: any) => {
+    const handleCourseUploadComplete = async (data: any) => {
         console.log('Course upload completed:', data);
         setNoteTitle(data.title);
 
         const newNoteId = data.noteId || `course_${Date.now()}`;
         setGeneratedNoteId(newNoteId);
 
-        // Add to demo contents for immediate access
-        addDemoContent({
+        const newContent: any = {
             id: newNoteId,
             title: data.title,
             description: data.description || `${data.platform} course notes for ${data.courseName} - ${data.chapter}`,
@@ -149,27 +175,17 @@ export const NoteUploadPage: React.FC = () => {
                 }
             },
             uploadedBy: user.name,
+            uploaderEmail: user.email, // Store email for reliable name lookup
             uploadedAt: new Date().toISOString(),
             views: 0,
             likes: 0,
             downloads: 0,
             videoUrl: data.verificationLink || data.videoUrl,  // Use verificationLink for thumbnail extraction
             coverImage: data.coverImage  // Fallback if no video URL
-        });
+        };
 
-        // Sync to My Drive - Course Captures section
-        driveSyncService.syncContribution({
-            subject: { id: data.platform?.toLowerCase() || 'course', name: data.platform || 'Course' },
-            topic: { id: data.courseName?.toLowerCase().replace(/\s+/g, '_') || 'general', title: data.courseName || 'General Course' },
-            subtopic: { id: data.chapter?.toLowerCase().replace(/\s+/g, '_') || 'chapter', title: data.chapter || 'Chapter 1' },
-            title: data.title,
-            description: data.description || '',
-            videoUrl: data.verificationLink || '',  // Use verification link for thumbnail extraction
-            coverImage: data.coverImage,  // Fallback image when no video URL
-            contentId: newNoteId,
-            quiz: data.quiz,
-            isCourseContent: true  // This marks it as course content for the Course Captures tab
-        });
+        // Add to user storage (persisted to GitHub via backend)
+        await addToUploads(newContent);
 
         setUploadComplete(true);
     };

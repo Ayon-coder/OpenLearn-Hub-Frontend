@@ -6,6 +6,7 @@ export interface DemoContent {
     description: string;
     organization: ContentOrganization;
     uploadedBy: string;
+    uploaderEmail?: string; // Email for reliable user lookup
     uploadedAt: string;
     views: number;
     likes: number;
@@ -35,6 +36,150 @@ export const refreshContents = (): DemoContent[] => {
 // Initialize directly with defaults
 const loadInitialContents = (): DemoContent[] => {
     return [
+        // =================== NEW COURSE CONTENT (TOP PRIORITY) ===================
+        // =================== NEW UNIVERSITY CONTENT ===================
+        // University: IIT Madras
+        {
+            id: 'uni_iit_madras_dsa',
+            title: 'Data Structures - IIT Madras',
+            description: 'Comprehensive lecture notes and problem sets from the CS2800 Data Structures course at IIT Madras.',
+            organization: {
+                primaryPath: 'university',
+                universityPath: {
+                    university: 'IIT Madras',
+                    semester: '3',
+                    department: 'Computer Science',
+                    subject: 'Data Structures',
+                    topic: 'Trees & Graphs'
+                }
+            },
+            uploadedBy: 'IIT Madras CSE',
+            uploadedAt: '2024-03-15T10:00:00Z',
+            views: 15600,
+            likes: 1200,
+            downloads: 4500,
+            tags: ['data_structures', 'iit_madras', 'btech', 'notes', 'cs'],
+            level: 'Intermediate',
+            videoUrl: 'https://www.youtube.com/embed/zWg7U0OEAoE' // NPTEL video
+        },
+        // University: BITS Pilani
+        {
+            id: 'uni_bits_dbms',
+            title: 'Database Systems - BITS Pilani',
+            description: 'Lecture slides and project guidelines for the Database Management Systems course.',
+            organization: {
+                primaryPath: 'university',
+                universityPath: {
+                    university: 'BITS Pilani',
+                    semester: '4',
+                    department: 'CSIS',
+                    subject: 'DBMS',
+                    topic: 'Normalization'
+                }
+            },
+            uploadedBy: 'BITS Pilani CSE',
+            uploadedAt: '2024-03-18T14:30:00Z',
+            views: 8900,
+            likes: 780,
+            downloads: 2100,
+            tags: ['dbms', 'sql', 'bits_pilani', 'university', 'notes'],
+            level: 'Intermediate',
+            videoUrl: 'https://www.youtube.com/embed/1UrYXuJpvyo'
+        },
+        // University: Stanford (Andrew Ng)
+        {
+            id: 'uni_stanford_ml',
+            title: 'CS229: Machine Learning - Stanford',
+            description: 'Official lecture notes and cheat sheets from Andrew Ng\'s legendary CS229 course at Stanford.',
+            organization: {
+                primaryPath: 'university',
+                universityPath: {
+                    university: 'Stanford University',
+                    semester: 'Fall',
+                    department: 'Computer Science',
+                    subject: 'Machine Learning',
+                    topic: 'Supervised Learning'
+                }
+            },
+            uploadedBy: 'Andrew Ng',
+            uploadedAt: '2024-03-10T09:00:00Z',
+            views: 35000,
+            likes: 4500,
+            downloads: 9800,
+            tags: ['stanford', 'machine_learning', 'cs229', 'ai', 'notes'],
+            level: 'Advanced',
+            videoUrl: 'https://www.youtube.com/embed/jGwO_UgTS7I'
+        },
+        // University: MIT OCW
+        {
+            id: 'uni_mit_algo',
+            title: 'MIT 6.006: Introduction to Algorithms',
+            description: 'Lecture notes, problem sets, and quiz solutions from MIT OpenCourseWare.',
+            organization: {
+                primaryPath: 'university',
+                universityPath: {
+                    university: 'MIT',
+                    semester: 'Spring',
+                    department: 'EECS',
+                    subject: 'Algorithms',
+                    topic: 'Sorting'
+                }
+            },
+            uploadedBy: 'FreeCodeCamp',
+            uploadedAt: '2024-03-12T11:00:00Z',
+            views: 22000,
+            likes: 2100,
+            downloads: 5600,
+            tags: ['mit', 'algorithms', 'ocw', 'computer_science', 'notes'],
+            level: 'Advanced',
+            videoUrl: 'https://www.youtube.com/embed/HtSuA80QTyo'
+        },
+
+        // Course: Python Bootcamp
+        {
+            id: 'course_python_bootcamp',
+            title: '100 Days of Code: The Complete Python Pro Bootcamp',
+            description: 'Master Python by building 100 projects in 100 days. Learn data science, automation, build websites, games and apps!',
+            organization: { primaryPath: 'course', coursePath: { provider: 'Udemy', courseName: '100 Days of Code', instructor: 'Dr. Angela Yu', topic: 'Python', resourceTitle: 'Python Bootcamp' } },
+            uploadedBy: 'Dr. Angela Yu',
+            uploadedAt: '2024-03-22T09:00:00Z',
+            views: 45000,
+            likes: 5600,
+            downloads: 12000,
+            tags: ['python', 'programming', 'bootcamp', 'data_science', 'web_development'],
+            level: 'Beginner',
+            videoUrl: 'https://www.udemy.com/course/100-days-of-code/'
+        },
+        // Course: React Native
+        {
+            id: 'course_react_native',
+            title: 'React Native - The Practical Guide',
+            description: 'Use React Native and your React knowledge to build native iOS and Android Apps - including Push Notifications, Hooks, Redux.',
+            organization: { primaryPath: 'course', coursePath: { provider: 'Udemy', courseName: 'React Native Guide', instructor: 'Maximilian Schwarzmüller', topic: 'Mobile Dev', resourceTitle: 'React Native Course' } },
+            uploadedBy: 'Academind',
+            uploadedAt: '2024-03-25T14:00:00Z',
+            views: 18500,
+            likes: 1900,
+            downloads: 3400,
+            tags: ['react_native', 'mobile_development', 'ios', 'android', 'javascript'],
+            level: 'Intermediate',
+            videoUrl: 'https://www.udemy.com/course/react-native-the-practical-guide/'
+        },
+        // Course: Machine Learning A-Z
+        {
+            id: 'course_ml_az',
+            title: 'Machine Learning A-Z™: AI, Python & R',
+            description: 'Learn to create Machine Learning Algorithms in Python and R from two Data Science experts. Code templates included.',
+            organization: { primaryPath: 'course', coursePath: { provider: 'SuperDataScience', courseName: 'Machine Learning A-Z', instructor: 'Kirill Eremenko', topic: 'AI', resourceTitle: 'ML Masterclass' } },
+            uploadedBy: 'Kirill Eremenko',
+            uploadedAt: '2024-03-28T11:00:00Z',
+            views: 32000,
+            likes: 3100,
+            downloads: 8900,
+            tags: ['machine_learning', 'ai', 'python', 'r_programming', 'data_science'],
+            level: 'Beginner',
+            videoUrl: 'https://www.udemy.com/course/machinelearning/'
+        },
         // --- DATA STRUCTURES & ALGORITHMS ---
         {
             id: 'dsa_1',
@@ -737,7 +882,7 @@ const loadInitialContents = (): DemoContent[] => {
             downloads: 800,
             tags: ['data_structures', 'graphs', 'algorithms', 'bfs', 'dfs', 'dsa'],
             level: 'Advanced'
-        }
+        },
     ];
 };
 

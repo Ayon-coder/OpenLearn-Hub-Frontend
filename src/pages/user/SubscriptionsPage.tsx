@@ -1,20 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Filter, ChevronDown, BookOpen } from 'lucide-react';
-import { authService } from '@/services/auth/authService';
 import { subscriptionService } from '@/services/user/subscriptionService';
 import { SubscriptionCreatorView } from '@/types';
 import { SubscriptionCreatorRow } from '@/components/content/SubscriptionCreatorRow';
 import { EmptySubscriptions } from '@/components/ui/EmptySubscriptions';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { CourseGatekeeperModal } from '@/components/modals/CourseGatekeeperModal';
-import { DEMO_CONTENTS } from '@/data/demoContents';
+import { useGlobalContent } from '@/hooks/useGlobalContent';
+import { useUserStorage } from '@/hooks/useUserStorage';
+import { useAuth } from '@/hooks/useAuth';
 
 type SortType = 'recent' | 'alphabetical' | 'most_notes';
 
 export const SubscriptionsPage: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const user = authService.getUser();
+    const { user } = useAuth();
+
+    // Use hooks for data
+    const { profile, loading: userLoading } = useUserStorage();
+    const { contents: globalContents, loading: globalLoading, error: globalError } = useGlobalContent();
+
+    // State
     const [subscriptions, setSubscriptions] = useState<SubscriptionCreatorView[]>([]);
     const [filteredSubscriptions, setFilteredSubscriptions] = useState<SubscriptionCreatorView[]>([]);
     const [selectedSubject, setSelectedSubject] = useState<string>('All');
@@ -33,37 +40,27 @@ export const SubscriptionsPage: React.FC = () => {
         }
     }, [user, navigate]);
 
-    // Load subscriptions
+    // Load and transform subscriptions
     useEffect(() => {
-        if (user) {
-            const subs = subscriptionService.getSubscriptions(user.id);
+        if (profile?.subscriptions && globalContents.length > 0) {
+            const subs = subscriptionService.getSubscriptions(profile.subscriptions, globalContents);
             setSubscriptions(subs);
             setFilteredSubscriptions(subs);
+        } else {
+            setSubscriptions([]);
+            setFilteredSubscriptions([]);
         }
-    }, [user?.id]);
-
-    // Listen for subscription changes
-    useEffect(() => {
-        const handleSubscriptionChange = () => {
-            if (user) {
-                const subs = subscriptionService.getSubscriptions(user.id);
-                setSubscriptions(subs);
-            }
-        };
-
-        window.addEventListener('subscription-change', handleSubscriptionChange);
-        return () => window.removeEventListener('subscription-change', handleSubscriptionChange);
-    }, [user?.id]);
+    }, [profile?.subscriptions, globalContents]);
 
     // Extract unique subjects from all notes
-    const subjects = Array.from(
+    const subjects = React.useMemo(() => Array.from(
         new Set(
             subscriptions.flatMap(sub => [
                 ...sub.communityNotes.map(g => g.notes).flat(),
                 ...sub.courseNotes.map(g => g.notes).flat()
             ].map(note => note.subject))
         )
-    ).filter(Boolean);
+    ).filter(Boolean), [subscriptions]);
 
     // Apply filters and sorting
     useEffect(() => {
@@ -115,8 +112,8 @@ export const SubscriptionsPage: React.FC = () => {
 
     // Handle course note click to show gatekeeper modal
     const handleCourseNoteClick = (noteId: string) => {
-        // Find the content in DEMO_CONTENTS to get course info
-        const content = DEMO_CONTENTS.find(c => c.id === noteId);
+        // Find the content in globalContents to get course info
+        const content = globalContents.find(c => c.id === noteId);
         if (content?.organization.coursePath) {
             setSelectedCourseName(content.organization.coursePath.courseName);
             setSelectedProvider(content.organization.coursePath.provider);
@@ -129,6 +126,14 @@ export const SubscriptionsPage: React.FC = () => {
 
     if (!user) {
         return null;
+    }
+
+    if (userLoading || globalLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-[50vh]">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-600"></div>
+            </div>
+        );
     }
 
     return (

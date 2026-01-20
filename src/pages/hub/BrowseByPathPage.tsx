@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, GraduationCap, Youtube, ChevronRight, Home, Folder, FileText, Trophy, Search } from 'lucide-react';
-import { DEMO_CONTENTS, DemoContent } from '@/data/demoContents';
+import { BookOpen, GraduationCap, Youtube, ChevronRight, Home, Folder, FileText, Trophy, Search, ShieldCheck, Loader2 } from 'lucide-react';
+import { DemoContent } from '@/data/demoContents';
+import { useGlobalContent } from '@/hooks/useGlobalContent';
 import { EnhancedContentCard } from '@/components/content/EnhancedContentCard';
 import { CourseGatekeeperModal } from '@/components/modals/CourseGatekeeperModal';
 
@@ -9,6 +10,7 @@ type BrowseTab = 'subject' | 'university' | 'channel' | 'course' | 'competitive_
 
 export const BrowseByPathPage: React.FC = () => {
     const navigate = useNavigate();
+    const { contents: DEMO_CONTENTS, loading, error } = useGlobalContent();
     const [activeTab, setActiveTab] = useState<BrowseTab>('subject');
 
     // Gating State
@@ -450,6 +452,33 @@ export const BrowseByPathPage: React.FC = () => {
             <div className={`absolute top-0 right-0 w-20 h-20 bg-gradient-to-br ${gradient} opacity-5 rounded-bl-full`}></div>
         </button>
     );
+
+    // Loading State
+    if (loading) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-screen space-y-4 bg-slate-50">
+                <Loader2 className="w-12 h-12 text-blue-600 animate-spin" />
+                <p className="text-gray-500 font-medium animate-pulse">Loading library contents...</p>
+            </div>
+        );
+    }
+
+    // Error State
+    if (error) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-screen space-y-4 bg-slate-50 p-6 text-center">
+                <ShieldCheck size={64} className="text-red-400" />
+                <h1 className="text-2xl font-black text-gray-900">Content Unavailable</h1>
+                <p className="text-gray-600 max-w-md">{error}</p>
+                <button
+                    onClick={() => window.location.reload()}
+                    className="px-6 py-2 bg-white border border-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-50 transition-colors shadow-sm"
+                >
+                    Retry
+                </button>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
