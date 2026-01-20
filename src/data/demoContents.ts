@@ -33,11 +33,13 @@ export const refreshContents = (): DemoContent[] => {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
             const parsed = JSON.parse(saved);
-            // Update the DEMO_CONTENTS array in-place
-            DEMO_CONTENTS.length = 0;
-            DEMO_CONTENTS.push(...parsed);
-            return DEMO_CONTENTS;
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                // Update the DEMO_CONTENTS array in-place only if we have valid data
+                DEMO_CONTENTS.length = 0;
+                DEMO_CONTENTS.push(...parsed);
+            }
         }
+        // If localStorage is empty or invalid, keep the existing DEMO_CONTENTS (default data)
     } catch (e) {
         console.error('Failed to refresh from localStorage', e);
     }
