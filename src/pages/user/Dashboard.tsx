@@ -357,7 +357,7 @@ export const Dashboard: React.FC = () => {
               {userCurricula.map((curriculum) => (
                 <div
                   key={curriculum.id}
-                  onClick={() => navigate(`/curriculum/result/${curriculum.id}`)}
+                  onClick={() => navigate(`/curriculum/${curriculum.id}`)}
                   className="group bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-xl hover:border-blue-200 transition-all cursor-pointer relative overflow-hidden"
                 >
                   <div className="absolute top-0 right-0 p-24 bg-gradient-to-br from-blue-50 to-purple-50 rounded-full blur-2xl -mr-12 -mt-12 opacity-50 group-hover:opacity-100 transition-opacity" />
