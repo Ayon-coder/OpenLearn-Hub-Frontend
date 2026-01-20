@@ -21,7 +21,8 @@ function findPlatformContent(topics: string[], title: string, level?: string, ma
         'introduction', 'intro', 'basics', 'basic', 'advanced', 'complete', 'guide',
         'tutorial', 'course', 'learn', 'learning', 'how', 'what', 'why', 'programming',
         'development', 'design', 'engineering', 'science', 'scratch', 'zero', 'hero',
-        'mastery', 'bootcamp', 'full', 'stack', 'concepts', 'principles'
+        'mastery', 'bootcamp', 'full', 'stack', 'concepts', 'principles',
+        'implementation', 'application', 'applications', 'examples', 'topic', 'model'
     ]);
 
     // 2. Helper to extract meaningful keywords
@@ -81,7 +82,8 @@ function findPlatformContent(topics: string[], title: string, level?: string, ma
 
         // LEVEL MATCHING (Important!)
         // Boost if content level matches the requested course level
-        if (level && content.level && level.toLowerCase() === content.level.toLowerCase()) {
+        // CRITICAL FIX: Only apply level boost if we have at least one keyword match!
+        if (matches > 0 && level && content.level && level.toLowerCase() === content.level.toLowerCase()) {
             score += 15; // Significant boost for correct level
         }
 
@@ -96,9 +98,9 @@ function findPlatformContent(topics: string[], title: string, level?: string, ma
         return { content, score, matches };
     });
 
-    // 5. Threshold: Require at least 10 points (lenient match)
+    // 5. Threshold: Require at least 15 points (stricter match)
     return scoredContent
-        .filter(item => item.score >= 10)
+        .filter(item => item.score >= 15)
         .sort((a, b) => b.score - a.score)
         .slice(0, 2)
         .map(item => item.content);
