@@ -15,7 +15,12 @@ export const AIAssistantPage: React.FC = () => {
     const [isCheckingBackend, setIsCheckingBackend] = useState(true);
 
     useEffect(() => {
+        let interval: NodeJS.Timeout;
+
         const checkHealth = async () => {
+            // Only check if window is visible to save resources
+            if (document.hidden) return;
+
             setIsCheckingBackend(true);
             const status = await checkBackendHealth();
             setBackendStatus(status);
@@ -23,9 +28,23 @@ export const AIAssistantPage: React.FC = () => {
         };
 
         checkHealth();
-        // Check backend health periodically
-        const interval = setInterval(checkHealth, 30000);
-        return () => clearInterval(interval);
+
+        // Check verify less frequently (60s) and only if visible
+        interval = setInterval(checkHealth, 60000);
+
+        // Add visibility listener to check immediately when user returns
+        const handleVisibilityChange = () => {
+            if (!document.hidden) {
+                checkHealth();
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        return () => {
+            clearInterval(interval);
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
     }, []);
 
     return (
