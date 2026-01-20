@@ -19,9 +19,12 @@ export interface DemoContent {
 const STORAGE_KEY = 'openlearn_demo_contents_v5';
 
 export const addDemoContent = (content: DemoContent) => {
+    console.log('Adding new demo content:', content.title);
     DEMO_CONTENTS.unshift(content);
     try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(DEMO_CONTENTS));
+        const serialized = JSON.stringify(DEMO_CONTENTS);
+        localStorage.setItem(STORAGE_KEY, serialized);
+        console.log(`Saved ${DEMO_CONTENTS.length} items to localStorage (${serialized.length} bytes)`);
     } catch (e) {
         console.error('Failed to save to localStorage', e);
     }
@@ -46,17 +49,26 @@ export const refreshContents = (): DemoContent[] => {
     return DEMO_CONTENTS;
 };
 
-// Initialize with saved content or default
+// Initialize with saved content or default (and save defaults to localStorage on first load)
 const loadInitialContents = (): DemoContent[] => {
     try {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
-            return JSON.parse(saved);
+            console.log('Found saved content in localStorage:', saved.length, 'bytes');
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                console.log(`Loaded ${parsed.length} items from localStorage`);
+                return parsed;
+            }
+        } else {
+            console.log('No saved content found in localStorage, using defaults');
         }
     } catch (e) {
         console.error('Failed to load from localStorage', e);
     }
-    return [
+
+    // First-time load: return defaults and save them to localStorage
+    const defaultContents: DemoContent[] = [
         // --- DATA STRUCTURES & ALGORITHMS ---
         {
             id: 'dsa_1',
