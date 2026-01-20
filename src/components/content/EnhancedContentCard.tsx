@@ -16,8 +16,16 @@ export const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
     onClick,
     forceFree = false
 }) => {
-    const { title, description, organization, uploadedBy, views, likes } = content;
-    const { subjectPath, universityPath, channelPath } = organization;
+    // Fail-safe: if content or organization is missing, do not render to avoid crash
+    if (!content || !content.organization) {
+        return null;
+    }
+
+    const { title, description, organization, uploadedBy = 'Anonymous', views, likes } = content;
+    // Safe access to organization properties
+    const subjectPath = organization.subjectPath;
+    const universityPath = organization.universityPath;
+    const channelPath = organization.channelPath;
 
     // Mock interaction stats (in production, these would come from the content object)
     const upvotes = likes || 0;

@@ -13,6 +13,7 @@ import {
 import { DEMO_CONTENTS, DemoContent } from '@/data/demoContents';
 import { EnhancedContentCard } from '@/components/content/EnhancedContentCard';
 import { CourseGatekeeperModal } from '@/components/modals/CourseGatekeeperModal';
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 
 type TabType = 'community' | 'course';
 type SortType = 'recent' | 'popular' | 'rating' | 'downloads';
@@ -263,38 +264,40 @@ export const TrendingNotesPage: React.FC = () => {
             </div>
 
             {/* Content Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {displayedContent.length > 0 ? (
-                    displayedContent.map(content => (
-                        <div key={content.id} className="transform transition-all duration-300 hover:-translate-y-1">
-                            <EnhancedContentCard
-                                content={content}
-                                onClick={() => {
-                                    if (content.organization.coursePath) {
-                                        // Show gatekeeper modal for course content
-                                        setSelectedGatedContent(content);
-                                        setGatekeeperOpen(true);
-                                    } else if (content.organization.universityPath) {
-                                        // Navigate to course access page for university content
-                                        navigate(`/course/access/${content.id}`);
-                                    } else {
-                                        // Navigate to note with 'trending' context for proper My Drive organization
-                                        navigate(`/note/${content.id}?browseContext=trending`);
-                                    }
-                                }}
-                            />
+            <ErrorBoundary>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {displayedContent.length > 0 ? (
+                        displayedContent.map(content => (
+                            <div key={content.id} className="transform transition-all duration-300 hover:-translate-y-1">
+                                <EnhancedContentCard
+                                    content={content}
+                                    onClick={() => {
+                                        if (content.organization?.coursePath) {
+                                            // Show gatekeeper modal for course content
+                                            setSelectedGatedContent(content);
+                                            setGatekeeperOpen(true);
+                                        } else if (content.organization?.universityPath) {
+                                            // Navigate to course access page for university content
+                                            navigate(`/course/access/${content.id}`);
+                                        } else {
+                                            // Navigate to note with 'trending' context for proper My Drive organization
+                                            navigate(`/note/${content.id}?browseContext=trending`);
+                                        }
+                                    }}
+                                />
+                            </div>
+                        ))
+                    ) : (
+                        <div className="col-span-full py-12 text-center bg-white rounded-3xl border-2 border-dashed border-gray-200">
+                            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
+                                <Filter size={24} />
+                            </div>
+                            <h3 className="text-lg font-black text-gray-900 mb-1">No notes found</h3>
+                            <p className="text-gray-500 font-medium">Try adjusting your filters to see more results.</p>
                         </div>
-                    ))
-                ) : (
-                    <div className="col-span-full py-12 text-center bg-white rounded-3xl border-2 border-dashed border-gray-200">
-                        <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
-                            <Filter size={24} />
-                        </div>
-                        <h3 className="text-lg font-black text-gray-900 mb-1">No notes found</h3>
-                        <p className="text-gray-500 font-medium">Try adjusting your filters to see more results.</p>
-                    </div>
-                )}
-            </div>
+                    )}
+                </div>
+            </ErrorBoundary>
 
             <CourseGatekeeperModal
                 isOpen={gatekeeperOpen}
