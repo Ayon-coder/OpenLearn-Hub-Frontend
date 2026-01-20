@@ -92,8 +92,15 @@ export const CurriculumGeneratorPage: React.FC = () => {
                 return;
             }
 
+            if (!result.curriculum?.id) {
+                console.error('Generated curriculum missing ID:', result);
+                setError('Failed to retrieve curriculum ID.');
+                setIsLoading(false);
+                return;
+            }
+
             // Navigate to result page with curriculum ID
-            navigate(`/curriculum/${result.curriculum?.id}`);
+            navigate(`/curriculum/${result.curriculum.id}`);
         } catch (err: any) {
             setError(err.message || 'Failed to generate curriculum');
             setIsLoading(false);

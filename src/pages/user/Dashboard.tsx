@@ -23,9 +23,12 @@ import {
   Folder,
   Compass,
   Sparkles,
-  ArrowRight
+  ArrowRight,
+  GraduationCap,
+  CalendarDays
 } from 'lucide-react';
 import { driveSyncService } from '@/services/drive/driveSyncService';
+import { curriculumService, SavedCurriculum } from '@/services/curriculum/curriculumService';
 import { authService } from '@/services/auth/authService';
 import { AuthRequiredModal } from '@/components/modals/AuthRequiredModal';
 import { User, DriveItem } from '@/types';
@@ -133,6 +136,8 @@ export const Dashboard: React.FC = () => {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authModalFeature, setAuthModalFeature] = useState('');
   const [driveItems, setDriveItems] = useState<DriveItem[]>([]);
+  const [userCurricula, setUserCurricula] = useState<SavedCurriculum[]>([]);
+  const [loadingCurricula, setLoadingCurricula] = useState(false);
 
   React.useEffect(() => {
     setDriveItems(driveSyncService.getDriveItems());
@@ -141,6 +146,16 @@ export const Dashboard: React.FC = () => {
     window.addEventListener('drive-sync', handleSync);
     return () => window.removeEventListener('drive-sync', handleSync);
   }, []);
+
+  React.useEffect(() => {
+    if (user) {
+      setLoadingCurricula(true);
+      curriculumService.getUserCurricula(user.id)
+        .then(data => setUserCurricula(data))
+        .catch(err => console.error('Failed to load curricula', err))
+        .finally(() => setLoadingCurricula(false));
+    }
+  }, [user]);
 
   const handleRestrictedAction = (feature: string, path: string) => {
     if (!user) {
@@ -315,6 +330,63 @@ export const Dashboard: React.FC = () => {
           <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-8 text-white shadow-xl shadow-blue-200">
             <h1 className="text-3xl font-black mb-2">Welcome to OpenLearn Hub! 🚀</h1>
             <p className="text-blue-100 font-medium">Join our community to start your learning journey.</p>
+          </div>
+        )}
+
+        {/* My Learning Paths (New Section) */}
+        {user && userCurricula.length > 0 && (
+          <div>
+            <SectionHeader
+              title="My Learning Paths"
+              subtitle="Continue where you left off"
+              action={
+                <button onClick={() => navigate('/curriculum/generate')} className="text-blue-600 font-bold hover:underline flex items-center gap-1">
+                  <span>+ New Path</span>
+                </button>
+              }
+            />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {userCurricula.map((curriculum) => (
+                <div
+                  key={curriculum.id}
+                  onClick={() => navigate(`/curriculum/result/${curriculum.id}`)}
+                  className="group bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-xl hover:border-blue-200 transition-all cursor-pointer relative overflow-hidden"
+                >
+                  <div className="absolute top-0 right-0 p-24 bg-gradient-to-br from-blue-50 to-purple-50 rounded-full blur-2xl -mr-12 -mt-12 opacity-50 group-hover:opacity-100 transition-opacity" />
+
+                  <div className="relative z-10">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="p-3 bg-blue-100 text-blue-600 rounded-xl group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                        <GraduationCap size={24} />
+                      </div>
+                      <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-bold uppercase tracking-wider">
+                        {curriculum.curriculum.student_profile?.weekly_hours || 10}h / week
+                      </span>
+                    </div>
+
+                    <h3 className="text-xl font-black text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                      {curriculum.formData.learning_goal}
+                    </h3>
+
+                    <div className="flex items-center gap-4 text-sm text-gray-500 mb-6">
+                      <div className="flex items-center gap-1.5">
+                        <CalendarDays size={16} />
+                        <span>{new Date(curriculum.createdAt).toLocaleDateString()}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <BarChart3 size={16} />
+                        <span>{curriculum.curriculum.student_profile?.estimated_weeks || 4} Weeks</span>
+                      </div>
+                    </div>
+
+                    <button className="w-full py-3 bg-gray-50 text-gray-900 font-bold rounded-xl group-hover:bg-blue-600 group-hover:text-white transition-all flex items-center justify-center gap-2">
+                      <span>Resume Learning</span>
+                      <ArrowRight size={16} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 

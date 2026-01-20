@@ -1,49 +1,107 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-    ChevronDown, ChevronUp, BookOpen, Clock, Target,
-    CheckCircle, PlayCircle, Award, Briefcase, ArrowLeft,
+    ChevronDown, ChevronUp, BookOpen, Clock, Target, Calendar,
+    CheckCircle2, PlayCircle, Award, Briefcase, ArrowLeft,
     Loader2, AlertCircle, GraduationCap, Code, Layers,
-    ChevronRight, FileText, Lightbulb, ExternalLink, Play, Youtube
+    ChevronRight, FileText, Lightbulb, ExternalLink, Play, Youtube,
+    Library // Added missing import
 } from 'lucide-react';
 import { authService } from '@/services/auth/authService';
 import { curriculumService, SavedCurriculum, Course, LearningTier } from '@/services/curriculum/curriculumService';
 import { DEMO_CONTENTS, DemoContent } from '@/data/demoContents';
 
-// Helper to find matching platform content by topic keywords
-function findPlatformContent(topics: string[], title: string): DemoContent[] {
-    // Common words to exclude from matching
-    const stopWords = new Set([
-        'the', 'and', 'for', 'with', 'from', 'into', 'using', 'learn', 'learning',
-        'basics', 'basic', 'introduction', 'intro', 'advanced', 'beginner', 'course',
-        'tutorial', 'guide', 'complete', 'full', 'how', 'what', 'why', 'when',
-        'data', 'code', 'programming', 'development', 'building', 'creating'
+
+
+// Helper to find matching platform content - ROBUST & GENERIC & LEVEL-AWARE & SLUG-AWARE
+function findPlatformContent(topics: string[], title: string, level?: string, matchingCriteria?: any): DemoContent[] {
+    // 1. Define Stop Words (Generic words that shouldn't trigger a match)
+    const STOP_WORDS = new Set([
+        'and', 'or', 'the', 'a', 'an', 'in', 'on', 'at', 'to', 'for', 'of', 'with',
+        'introduction', 'intro', 'basics', 'basic', 'advanced', 'complete', 'guide',
+        'tutorial', 'course', 'learn', 'learning', 'how', 'what', 'why', 'programming',
+        'development', 'design', 'engineering', 'science', 'scratch', 'zero', 'hero',
+        'mastery', 'bootcamp', 'full', 'stack', 'concepts', 'principles'
     ]);
 
-    // Extract meaningful keywords (5+ chars, not stopwords)
-    const keywords = [...topics, ...title.split(' ')]
-        .map(k => k.toLowerCase().replace(/[^a-z0-9]/g, ''))
-        .filter(k => k.length >= 5 && !stopWords.has(k));
+    // 2. Helper to extract meaningful keywords
+    const getKeywords = (text: string[]) => {
+        return text.join(' ').toLowerCase()
+            .replace(/-/g, ' ') // Handle hyphens in slugs
+            .replace(/[^a-z0-9\s]/g, '') // Remove special chars
+            .split(/\s+/) // Split by whitespace
+            .filter(w => w.length > 2 && !STOP_WORDS.has(w)); // Filter small words & stop words
+    };
 
-    // Also keep exact topic matches (even if shorter)
-    const exactTopics = topics.map(t => t.toLowerCase());
+    // 3. Extract keywords from the Course we are looking for
+    // If we have specific matching criteria (New System), use that first!
+    let courseKeywords: Set<string>;
+    if (matchingCriteria) {
+        // Priority 1: Use specific slugs and keywords from AI
+        // Use explicit array for slugs
+        const slugs = [matchingCriteria.topic_slug, ...(matchingCriteria.subtopic_slugs || [])];
+        const criteriaKeywords = matchingCriteria.keywords || [];
+        // Extract keywords from slugs too
+        const slugKeywords = getKeywords(slugs);
+        courseKeywords = new Set([...slugKeywords, ...criteriaKeywords, ...getKeywords([title])]);
 
-    return DEMO_CONTENTS.filter(content => {
-        const contentTitle = content.title.toLowerCase();
-        const contentDesc = content.description?.toLowerCase() || '';
+        // Add variations if available
+        if (matchingCriteria.alternative_names) {
+            matchingCriteria.alternative_names.forEach((name: any) => {
+                getKeywords([name]).forEach(k => courseKeywords.add(k));
+            });
+        }
+    } else {
+        // Fallback: Legacy topic matching
+        courseKeywords = new Set(getKeywords([title, ...topics]));
+    }
 
-        // Check for exact topic match in title (stronger signal)
-        const hasExactTopicMatch = exactTopics.some(topic =>
-            contentTitle.includes(topic) || topic.includes(contentTitle.split(' ')[0])
-        );
+    // 4. Score content based on keyword intersection
+    const scoredContent = DEMO_CONTENTS.map(content => {
+        let score = 0;
 
-        // Check for keyword matches (require at least 2 matches for longer titles)
-        const keywordMatches = keywords.filter(keyword =>
-            contentTitle.includes(keyword) || contentDesc.includes(keyword)
-        );
+        // Get content keywords (Title + Tags)
+        const contentKeywords = getKeywords([content.title, ...(content.tags || [])]);
 
-        return hasExactTopicMatch || keywordMatches.length >= 2;
-    }).slice(0, 3); // Max 3 matches
+        // Count matches
+        let matches = 0;
+        contentKeywords.forEach(word => {
+            if (courseKeywords.has(word)) {
+                matches++;
+                score += 10; // Base score for keyword match
+            }
+        });
+
+        // Boost for Exact Phrase Matches in Title
+        const contentTitleLower = content.title.toLowerCase();
+        const courseTitleLower = title.toLowerCase();
+        if (contentTitleLower.includes(courseTitleLower) || courseTitleLower.includes(contentTitleLower)) {
+            score += 20;
+        }
+
+        // LEVEL MATCHING (Important!)
+        // Boost if content level matches the requested course level
+        if (level && content.level && level.toLowerCase() === content.level.toLowerCase()) {
+            score += 15; // Significant boost for correct level
+        }
+
+        // DOMAIN/EXAM CONTEXT MATCHING (New System)
+        if (matchingCriteria && matchingCriteria.exam_context && matchingCriteria.exam_context !== 'none') {
+            // Check for exam context in tags (e.g., 'gate', 'neet', 'aws')
+            if (content.tags && content.tags.includes(matchingCriteria.exam_context)) {
+                score += 50; // MASSIVE BOOST for matching exam context
+            }
+        }
+
+        return { content, score, matches };
+    });
+
+    // 5. Threshold: Require at least 10 points (lenient match)
+    return scoredContent
+        .filter(item => item.score >= 10)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 2)
+        .map(item => item.content);
 }
 
 // Generate external resource suggestions based on course topic
@@ -66,17 +124,18 @@ function generateExternalResources(course: Course): { title: string; url: string
 interface CourseCardProps {
     course: Course;
     tierColor: string;
+    level: string; // Added level prop
 }
 
-const CourseCard: React.FC<CourseCardProps> = ({ course, tierColor }) => {
+const CourseCard: React.FC<CourseCardProps> = ({ course, tierColor, level }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [showQuiz, setShowQuiz] = useState(false);
 
     return (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className={`bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden transition-all duration-300 ${isExpanded ? 'ring-2 ring-offset-2 ring-blue-500/20' : 'hover:shadow-md'}`}>
             <button
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="w-full p-6 flex items-center justify-between text-left hover:bg-gray-50 transition-all"
+                className="w-full flex items-center justify-between p-6 hover:bg-gray-50/50 transition-colors"
             >
                 <div className="flex items-center space-x-4">
                     <div className={`w-10 h-10 rounded-xl ${tierColor} flex items-center justify-center text-white font-bold`}>
@@ -103,10 +162,26 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, tierColor }) => {
                 <div className="px-6 pb-6 animate-in fade-in slide-in-from-top-2 duration-200">
                     <p className="text-gray-600 mb-4">{course.description}</p>
 
+                    {/* Exam & Relevance Badges */}
+                    {(course.weightage || course.exam_relevance) && (
+                        <div className="flex flex-wrap gap-2 mb-4">
+                            {course.weightage && (
+                                <span className="px-3 py-1 bg-yellow-50 text-yellow-700 rounded-full text-xs font-bold border border-yellow-200 shadow-sm">
+                                    ⚖️ {course.weightage} Weightage
+                                </span>
+                            )}
+                            {course.exam_relevance && (
+                                <span className="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-xs font-bold border border-purple-200 shadow-sm">
+                                    🎯 {course.exam_relevance}
+                                </span>
+                            )}
+                        </div>
+                    )}
+
                     <div className="mb-4">
                         <h5 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Topics</h5>
                         <div className="flex flex-wrap gap-2">
-                            {course.topics.map((topic, i) => (
+                            {(course.topics || []).map((topic, i) => (
                                 <span key={i} className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm font-medium">
                                     {topic}
                                 </span>
@@ -117,33 +192,34 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, tierColor }) => {
                     <div className="mb-4">
                         <h5 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Learning Outcomes</h5>
                         <ul className="space-y-2">
-                            {course.learning_outcomes.map((outcome, i) => (
-                                <li key={i} className="flex items-start space-x-2 text-gray-600">
-                                    <CheckCircle size={16} className="text-green-500 mt-0.5 flex-shrink-0" />
+                            {(course.learning_outcomes || []).map((outcome, i) => (
+                                <li key={i} className="flex items-start space-x-2 text-sm text-gray-600">
+                                    <CheckCircle2 size={16} className="text-green-500 mt-0.5 shrink-0" />
                                     <span>{outcome}</span>
                                 </li>
                             ))}
                         </ul>
                     </div>
 
-                    <div className="mb-4 p-4 bg-blue-50 rounded-xl">
-                        <h5 className="font-bold text-blue-700 mb-1 flex items-center space-x-2">
+                    {/* Hands-on Project */}
+                    <div className="bg-blue-50 rounded-xl p-4 mb-6 border border-blue-100">
+                        <h5 className="text-blue-700 font-bold text-sm mb-1 flex items-center space-x-2">
                             <Code size={16} />
                             <span>Hands-on Project</span>
                         </h5>
                         <p className="text-blue-600 text-sm">{course.hands_on_project}</p>
                     </div>
 
-                    {/* Learning Materials Section */}
-                    <div className="mb-4">
-                        <h5 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4 flex items-center space-x-2">
-                            <span className="text-base">📚</span>
+                    {/* Learning Materials */}
+                    <div>
+                        <h5 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3 flex items-center space-x-1">
+                            <Library size={14} />
                             <span>Learning Materials</span>
                         </h5>
 
                         {/* Platform Content */}
                         {(() => {
-                            const platformContent = findPlatformContent(course.topics, course.title);
+                            const platformContent = findPlatformContent(course.topics || [], course.title, level, course.matching_criteria);
                             const externalResources = generateExternalResources(course);
 
                             return (
@@ -258,7 +334,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, tierColor }) => {
 
                         {showQuiz && (
                             <div className="mt-4 space-y-4 animate-in fade-in slide-in-from-top-2">
-                                {course.quiz.map((q, i) => (
+                                {(course.quiz || []).map((q, i) => (
                                     <QuizQuestion key={i} question={q} index={i} />
                                 ))}
                             </div>
@@ -326,6 +402,7 @@ interface TierSectionProps {
 
 const TierSection: React.FC<TierSectionProps> = ({ tier, tierName, tierColor, tierIcon }) => {
     const [isExpanded, setIsExpanded] = useState(tierName === 'Beginner');
+    if (!tier) return null;
 
     return (
         <div className="mb-6">
@@ -346,7 +423,7 @@ const TierSection: React.FC<TierSectionProps> = ({ tier, tierName, tierColor, ti
                         <p className="text-white/70 text-xs">videos</p>
                     </div>
                     <div className="text-right">
-                        <p className="text-2xl font-black">{tier.estimated_hours}h</p>
+                        <p className="text-2xl font-black">{tier.total_estimated_hours || (tier as any).estimated_hours}h</p>
                         <p className="text-white/70 text-xs">duration</p>
                     </div>
                     {isExpanded ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
@@ -355,8 +432,8 @@ const TierSection: React.FC<TierSectionProps> = ({ tier, tierName, tierColor, ti
 
             {isExpanded && (
                 <div className="mt-4 space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
-                    {tier.courses.map((course) => (
-                        <CourseCard key={course.position} course={course} tierColor={tierColor} />
+                    {(tier.courses || []).map((course) => (
+                        <CourseCard key={course.position} course={course} tierColor={tierColor} level={tierName} />
                     ))}
                 </div>
             )}
@@ -433,6 +510,15 @@ export const CurriculumResultPage: React.FC = () => {
 
     const { curriculum: data, formData } = curriculum;
 
+    // Data Normalization (Handle Legacy vs New Schema)
+    const profile = {
+        summary: data.student_analysis?.profile_summary || data.student_profile?.summary || '',
+        starting_tier: data.student_analysis?.starting_tier || data.student_profile?.recommended_start_tier || 'Beginner',
+        weekly_hours: data.student_analysis?.weekly_hours_needed || data.student_profile?.weekly_hours || 0,
+        weeks: data.student_analysis?.estimated_completion_weeks || data.student_profile?.estimated_weeks || 0
+    };
+    const tiers = data.learning_path || data.curriculum || {} as any;
+
     return (
         <div className="min-h-screen bg-gray-50 py-12 px-6">
             <div className="max-w-5xl mx-auto">
@@ -453,10 +539,10 @@ export const CurriculumResultPage: React.FC = () => {
                                 <GraduationCap size={32} />
                                 <h1 className="text-3xl font-black">{formData.learning_goal}</h1>
                             </div>
-                            <p className="text-white/80 max-w-2xl">{data.student_analysis.profile_summary}</p>
+                            <p className="text-white/80 max-w-2xl">{profile.summary}</p>
                         </div>
                         <div className="text-right">
-                            <p className="text-4xl font-black">{data.student_analysis.estimated_completion_weeks}</p>
+                            <p className="text-4xl font-black">{profile.weeks}</p>
                             <p className="text-white/70">weeks</p>
                         </div>
                     </div>
@@ -464,76 +550,122 @@ export const CurriculumResultPage: React.FC = () => {
                     <div className="grid grid-cols-4 gap-6 mt-8 pt-6 border-t border-white/20">
                         <div>
                             <p className="text-white/70 text-sm">Starting Level</p>
-                            <p className="font-bold text-lg">{data.student_analysis.starting_tier}</p>
+                            <p className="font-bold text-lg">{profile.starting_tier}</p>
                         </div>
                         <div>
                             <p className="text-white/70 text-sm">Weekly Hours</p>
-                            <p className="font-bold text-lg">{data.student_analysis.weekly_hours_needed}h</p>
+                            <p className="font-bold text-lg">{profile.weekly_hours}h</p>
                         </div>
                         <div>
-                            <p className="text-white/70 text-sm">Learning Style</p>
-                            <p className="font-bold text-lg capitalize">{formData.learning_style}</p>
+                            <p className="text-white/70 text-sm">Duration</p>
+                            <p className="font-bold text-lg">{profile.weeks} weeks</p>
                         </div>
                         <div>
-                            <p className="text-white/70 text-sm">Total Videos</p>
+                            <p className="text-white/70 text-sm">Total Hours</p>
                             <p className="font-bold text-lg">
-                                {data.learning_path.beginner.total_videos +
-                                    data.learning_path.intermediate.total_videos +
-                                    data.learning_path.advanced.total_videos}
+                                {(tiers.beginner?.total_estimated_hours || 0) +
+                                    (tiers.intermediate?.total_estimated_hours || 0) +
+                                    (tiers.advanced?.total_estimated_hours || 0)}h
                             </p>
                         </div>
                     </div>
                 </div>
 
-                {/* Personalization */}
-                <div className="bg-white rounded-2xl p-6 mb-8 shadow-sm border border-gray-100">
-                    <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center space-x-2">
-                        <Lightbulb className="text-yellow-500" size={20} />
-                        <span>Personalized for You</span>
-                    </h2>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Recommended Pace</p>
-                            <p className="text-gray-700 font-medium">{data.personalization.recommended_pace}</p>
+                {/* Personalization (Legacy Only) */}
+                {data.personalization && (
+                    <div className="bg-white rounded-2xl p-6 mb-8 shadow-sm border border-gray-100">
+                        <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center space-x-2">
+                            <Lightbulb className="text-yellow-500" size={20} />
+                            <span>Personalized for You</span>
+                        </h2>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Recommended Pace</p>
+                                <p className="text-gray-700 font-medium">{data.personalization.recommended_pace}</p>
+                            </div>
+                            <div>
+                                <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Style Adaptations</p>
+                                <p className="text-gray-700 font-medium">{data.personalization.learning_style_adaptations}</p>
+                            </div>
+                            {(data.personalization.emphasized_areas || []).length > 0 && (
+                                <div className="col-span-2">
+                                    <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Emphasized Topics</p>
+                                    <div className="flex flex-wrap gap-2">
+                                        {(data.personalization.emphasized_areas || []).map((area, i) => (
+                                            <span key={i} className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
+                                                {area}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
-                        <div>
-                            <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Style Adaptations</p>
-                            <p className="text-gray-700 font-medium">{data.personalization.learning_style_adaptations}</p>
+                    </div>
+                )}
+                {/* Exam Strategy (If Applicable) */}
+                {data.exam_strategy?.if_exam_prep && (
+                    <div className="bg-gradient-to-br from-indigo-900 to-purple-900 rounded-2xl p-6 mb-8 shadow-xl text-white">
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-lg font-bold flex items-center space-x-2">
+                                <Target className="text-yellow-400" size={24} />
+                                <span>Exam Strategy & Timeline</span>
+                            </h2>
+                            <span className="px-3 py-1 bg-white/10 rounded-full text-xs font-medium">
+                                {data.exam_strategy.if_exam_prep.study_schedule.weeks_until_exam} Weeks to Exam
+                            </span>
                         </div>
-                        {data.personalization.emphasized_areas.length > 0 && (
-                            <div className="col-span-2">
-                                <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Emphasized Topics</p>
+
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            {['phase_1', 'phase_2', 'phase_3', 'phase_4'].map((phase, i) => {
+                                const phaseData = data.exam_strategy?.if_exam_prep?.study_schedule[phase];
+                                if (!phaseData) return null;
+                                return (
+                                    <div key={i} className="bg-white/10 rounded-xl p-4 border border-white/10">
+                                        <div className="flex items-center space-x-2 mb-2 text-indigo-300">
+                                            <Calendar size={16} />
+                                            <span className="text-xs uppercase tracking-wider font-bold">Phase {i + 1}</span>
+                                        </div>
+                                        <p className="font-medium text-sm">{phaseData}</p>
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        {data.exam_strategy.if_exam_prep.topic_prioritization && (
+                            <div className="mt-6 pt-6 border-t border-white/10">
+                                <h3 className="text-sm font-bold text-indigo-200 uppercase tracking-widest mb-3">High Priority Topics</h3>
                                 <div className="flex flex-wrap gap-2">
-                                    {data.personalization.emphasized_areas.map((area, i) => (
-                                        <span key={i} className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
-                                            {area}
-                                        </span>
+                                    {data.exam_strategy.if_exam_prep.topic_prioritization.map((topic, i) => (
+                                        <div key={i} className="flex items-center space-x-2 bg-yellow-500/20 px-3 py-1.5 rounded-lg border border-yellow-500/30">
+                                            <span className="text-yellow-200 font-bold text-sm">{topic.topic}</span>
+                                            <span className="text-yellow-100/60 text-xs">({topic.recommended_hours}h)</span>
+                                        </div>
                                     ))}
                                 </div>
                             </div>
                         )}
                     </div>
-                </div>
+                )}
 
                 {/* Learning Path Tiers */}
                 <h2 className="text-2xl font-black text-gray-900 mb-6">Learning Path</h2>
 
                 <TierSection
-                    tier={data.learning_path.beginner}
+                    tier={tiers.beginner}
                     tierName="Beginner"
                     tierColor="bg-gradient-to-r from-green-500 to-emerald-600"
                     tierIcon={<BookOpen size={28} />}
                 />
 
                 <TierSection
-                    tier={data.learning_path.intermediate}
+                    tier={tiers.intermediate}
                     tierName="Intermediate"
                     tierColor="bg-gradient-to-r from-blue-500 to-cyan-600"
                     tierIcon={<Layers size={28} />}
                 />
 
                 <TierSection
-                    tier={data.learning_path.advanced}
+                    tier={tiers.advanced}
                     tierName="Advanced"
                     tierColor="bg-gradient-to-r from-purple-500 to-pink-600"
                     tierIcon={<Award size={28} />}
@@ -548,7 +680,7 @@ export const CurriculumResultPage: React.FC = () => {
                     <div className="relative">
                         <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200" />
                         <div className="space-y-6">
-                            {data.progress_milestones.map((milestone, i) => (
+                            {(data.progress_milestones || []).map((milestone, i) => (
                                 <div key={i} className="relative flex items-start space-x-6 pl-10">
                                     <div className={`absolute left-0 w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm ${milestone.tier === 'beginner' ? 'bg-green-500' :
                                         milestone.tier === 'intermediate' ? 'bg-blue-500' : 'bg-purple-500'
@@ -558,7 +690,7 @@ export const CurriculumResultPage: React.FC = () => {
                                     <div className="flex-1">
                                         <h4 className="font-bold text-gray-900">{milestone.milestone_name}</h4>
                                         <p className="text-gray-500 text-sm mt-1">
-                                            {milestone.videos_completed} videos completed • {milestone.skills_unlocked.join(', ')}
+                                            {milestone.videos_completed} videos completed • {(milestone.skills_unlocked || []).join(', ')}
                                         </p>
                                         <p className="text-blue-600 text-sm mt-2 font-medium flex items-center space-x-1">
                                             <ChevronRight size={14} />
@@ -572,70 +704,74 @@ export const CurriculumResultPage: React.FC = () => {
                 </div>
 
                 {/* Final Project */}
-                <div className="bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl p-6 mb-8 text-white shadow-xl">
-                    <h2 className="text-lg font-bold mb-4 flex items-center space-x-2">
-                        <Code size={20} />
-                        <span>Capstone Project: {data.final_project.title}</span>
-                    </h2>
-                    <p className="text-white/90 mb-4">{data.final_project.description}</p>
-                    <div className="flex items-center space-x-6 text-sm">
-                        <span className="flex items-center space-x-1">
-                            <Clock size={14} />
-                            <span>{data.final_project.estimated_hours}h estimated</span>
-                        </span>
-                    </div>
-                    <div className="mt-4">
-                        <p className="text-white/70 text-xs uppercase tracking-widest mb-2">Deliverables</p>
-                        <div className="flex flex-wrap gap-2">
-                            {data.final_project.deliverables.map((d, i) => (
-                                <span key={i} className="px-3 py-1 bg-white/20 rounded-full text-sm">{d}</span>
-                            ))}
+                {data.final_project && (
+                    <div className="bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl p-6 mb-8 text-white shadow-xl">
+                        <h2 className="text-lg font-bold mb-4 flex items-center space-x-2">
+                            <Code size={20} />
+                            <span>Capstone Project: {data.final_project.title}</span>
+                        </h2>
+                        <p className="text-white/90 mb-4">{data.final_project.description}</p>
+                        <div className="flex items-center space-x-6 text-sm">
+                            <span className="flex items-center space-x-1">
+                                <Clock size={14} />
+                                <span>{data.final_project.estimated_hours}h estimated</span>
+                            </span>
+                        </div>
+                        <div className="mt-4">
+                            <p className="text-white/70 text-xs uppercase tracking-widest mb-2">Deliverables</p>
+                            <div className="flex flex-wrap gap-2">
+                                {(data.final_project.deliverables || []).map((d, i) => (
+                                    <span key={i} className="px-3 py-1 bg-white/20 rounded-full text-sm">{d}</span>
+                                ))}
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
 
                 {/* Career Outcomes */}
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                    <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center space-x-2">
-                        <Briefcase className="text-indigo-500" size={20} />
-                        <span>Career Outcomes</span>
-                    </h2>
-                    <div className="grid grid-cols-3 gap-6">
-                        <div>
-                            <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Job Titles</p>
-                            <ul className="space-y-2">
-                                {data.career_outcomes.job_titles.map((title, i) => (
-                                    <li key={i} className="flex items-center space-x-2 text-gray-700">
-                                        <CheckCircle size={14} className="text-green-500" />
-                                        <span>{title}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                        <div>
-                            <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Portfolio Pieces</p>
-                            <ul className="space-y-2">
-                                {data.career_outcomes.portfolio_pieces.map((piece, i) => (
-                                    <li key={i} className="flex items-center space-x-2 text-gray-700">
-                                        <CheckCircle size={14} className="text-blue-500" />
-                                        <span>{piece}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                        <div>
-                            <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Next Steps</p>
-                            <ul className="space-y-2">
-                                {data.career_outcomes.next_learning_paths.map((path, i) => (
-                                    <li key={i} className="flex items-center space-x-2 text-gray-700">
-                                        <ChevronRight size={14} className="text-purple-500" />
-                                        <span>{path}</span>
-                                    </li>
-                                ))}
-                            </ul>
+                {data.career_outcomes && (
+                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                        <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center space-x-2">
+                            <Briefcase className="text-indigo-500" size={20} />
+                            <span>Career Outcomes</span>
+                        </h2>
+                        <div className="grid grid-cols-3 gap-6">
+                            <div>
+                                <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Job Titles</p>
+                                <ul className="space-y-2">
+                                    {(data.career_outcomes.job_titles || []).map((title, i) => (
+                                        <li key={i} className="flex items-center space-x-2 text-gray-700">
+                                            <CheckCircle2 size={14} className="text-green-500" />
+                                            <span>{title}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                            <div>
+                                <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Portfolio Pieces</p>
+                                <ul className="space-y-2">
+                                    {(data.career_outcomes.portfolio_pieces || []).map((piece, i) => (
+                                        <li key={i} className="flex items-center space-x-2 text-gray-700">
+                                            <CheckCircle2 size={14} className="text-blue-500" />
+                                            <span>{piece}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                            <div>
+                                <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Next Steps</p>
+                                <ul className="space-y-2">
+                                    {(data.career_outcomes.next_learning_paths || []).map((path, i) => (
+                                        <li key={i} className="flex items-center space-x-2 text-gray-700">
+                                            <ChevronRight size={14} className="text-purple-500" />
+                                            <span>{path}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
 
                 {/* Generate Another */}
                 <div className="text-center mt-12">

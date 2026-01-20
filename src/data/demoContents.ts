@@ -11,10 +11,12 @@ export interface DemoContent {
     likes: number;
     downloads: number;
     videoUrl?: string;
-    coverImage?: string;  // Fallback image when videoUrl is not available
+    coverImage?: string;
+    tags?: string[];
+    level?: 'Beginner' | 'Intermediate' | 'Advanced'; // Added level matching
 }
 
-const STORAGE_KEY = 'openlearn_demo_contents_v4';
+const STORAGE_KEY = 'openlearn_demo_contents_v5';
 
 export const addDemoContent = (content: DemoContent) => {
     DEMO_CONTENTS.unshift(content);
@@ -36,146 +38,146 @@ const loadInitialContents = (): DemoContent[] => {
         console.error('Failed to load from localStorage', e);
     }
     return [
-        // SUBJECT-WISE: Array Implementation
+        // --- DATA STRUCTURES & ALGORITHMS ---
         {
-            id: 'content_1_subject',
+            id: 'dsa_1',
             title: 'Array Implementation in C',
-            description: 'Complete guide to implementing arrays in C programming with examples',
-            organization: {
-                primaryPath: 'subject',
-                subjectPath: {
-                    subject: 'Computer Science',
-                    coreTopic: 'Data Structures',
-                    subtopic: 'Arrays',
-                    resourceTitle: 'Array Implementation in C'
-                }
-            },
-            uploadedBy: 'Rahul Kumar',
-            uploadedAt: '2024-01-15T10:30:00Z',
-            views: 1250,
-            likes: 89,
-            downloads: 342,
-            videoUrl: 'https://www.youtube.com/embed/1uADAjweDwk'
-        },
-        // UNIVERSITY-WISE: Array Implementation (IIT Bombay)
-        {
-            id: 'content_1_university',
-            title: 'Array Implementation in C - IIT Bombay Lecture',
-            description: 'IIT Bombay CSE lecture on implementing arrays in C programming',
-            organization: {
-                primaryPath: 'university',
-                universityPath: {
-                    university: 'IIT Bombay',
-                    semester: '3',
-                    department: 'Computer Science & Engineering (CSE)',
-                    subject: 'Data Structures and Algorithms',
-                    topic: 'Arrays and Linked Lists'
-                }
-            },
-            uploadedBy: 'IIT Bombay CSE',
-            uploadedAt: '2024-01-15T10:30:00Z',
-            views: 850,
-            likes: 67,
-            downloads: 230,
-            videoUrl: 'https://www.youtube.com/embed/1uADAjweDwk'
-        },
-        // CHANNEL-WISE: Array Implementation (CodeWithHarry)
-        {
-            id: 'content_1_channel',
-            title: 'Array Implementation in C - CodeWithHarry',
-            description: 'CodeWithHarry DSA course: Complete guide to implementing arrays in C',
-            organization: {
-                primaryPath: 'channel',
-                channelPath: {
-                    channelName: 'CodeWithHarry',
-                    playlistName: 'DSA Full Course',
-                    topic: 'Arrays',
-                    resourceTitle: 'Array Implementation Notes'
-                }
-            },
-            uploadedBy: 'CodeWithHarry',
-            uploadedAt: '2024-01-15T10:30:00Z',
-            views: 2100,
-            likes: 156,
-            downloads: 450,
-            videoUrl: 'https://www.youtube.com/embed/1uADAjweDwk'
-        },
-        // UNIVERSITY-WISE: Binary Search Trees (IIT Delhi)
-        {
-            id: 'content_2_university',
-            title: 'Binary Search Trees - IIT Delhi Lecture',
-            description: 'IIT Delhi CSE lecture on BST operations, traversals, and applications',
-            organization: {
-                primaryPath: 'university',
-                universityPath: {
-                    university: 'IIT Delhi',
-                    semester: '4',
-                    department: 'Computer Science & Engineering (CSE)',
-                    subject: 'Advanced Data Structures',
-                    topic: 'Binary Search Trees'
-                }
-            },
-            uploadedBy: 'IIT Delhi CSE',
-            uploadedAt: '2024-01-18T14:20:00Z',
-            views: 1200,
-            likes: 92,
-            downloads: 340,
-            videoUrl: 'https://www.youtube.com/embed/pTB0EiFlISw'
-        },
-        // CHANNEL-WISE: Binary Search Trees (Abdul Bari)
-        {
-            id: 'content_2_channel',
-            title: 'Binary Search Trees - Abdul Bari Algorithms Course',
-            description: 'Abdul Bari comprehensive tutorial on BST operations, traversals, and applications',
-            organization: {
-                primaryPath: 'channel',
-                channelPath: {
-                    channelName: 'Abdul Bari',
-                    playlistName: 'Algorithms',
-                    topic: 'Trees',
-                    resourceTitle: 'BST Lecture Notes'
-                }
-            },
-            uploadedBy: 'Abdul Bari',
-            uploadedAt: '2024-01-18T14:20:00Z',
-            views: 3400,
-            likes: 245,
-            downloads: 780,
-            videoUrl: 'https://www.youtube.com/embed/pTB0EiFlISw'
+            description: 'Complete guide to implementing arrays in C programming with examples.',
+            organization: { primaryPath: 'subject', subjectPath: { subject: 'Computer Science', coreTopic: 'Data Structures', subtopic: 'Arrays', resourceTitle: 'Array Implementation' } },
+            uploadedBy: 'Rahul Kumar', uploadedAt: '2024-01-15T10:30:00Z', views: 1250, likes: 89, downloads: 342,
+            videoUrl: 'https://www.youtube.com/embed/1uADAjweDwk',
+            tags: ['C', 'Arrays', 'Data Structures', 'Programming'], level: 'Beginner'
         },
         {
-            id: 'content_3',
-            title: 'Python Loops Tutorial',
-            description: 'For, while, and nested loops in Python with practical examples',
-            organization: {
-                primaryPath: 'channel',
-                subjectPath: {
-                    subject: 'Computer Science',
-                    coreTopic: 'Programming',
-                    subtopic: 'Python Basics',
-                    resourceTitle: 'Python Loops Tutorial'
-                },
-                channelPath: {
-                    channelName: 'Apna College',
-                    playlistName: 'Python Tutorial Series',
-                    topic: 'Loops and Iterations',
-                    resourceTitle: 'Complete Loops Guide'
-                },
-                coursePath: {
-                    provider: 'Coursera',
-                    instructor: 'Google',
-                    courseName: 'Crash Course on Python',
-                    topic: 'Loops and Iterations',
-                    resourceTitle: 'Complete Loops Guide'
-                }
-            },
-            uploadedBy: 'Amit Patel',
-            uploadedAt: '2024-01-20T09:15:00Z',
-            views: 3400,
-            likes: 245,
-            downloads: 890,
-            videoUrl: 'https://www.youtube.com/embed/wxds6MAtUQ0'
+            id: 'dsa_2',
+            title: 'Graph Algorithms - BFS & DFS',
+            description: 'Visual explanation of Breadth-First and Depth-First Search algorithms.',
+            organization: { primaryPath: 'subject', subjectPath: { subject: 'Computer Science', coreTopic: 'Algorithms', subtopic: 'Graphs', resourceTitle: 'Graph Traversal' } },
+            uploadedBy: 'Jenny\'s Lectures', uploadedAt: '2024-02-10T14:20:00Z', views: 5600, likes: 450, downloads: 120,
+            videoUrl: 'https://www.youtube.com/embed/pcKY4hjDrxk',
+            tags: ['Graphs', 'BFS', 'DFS', 'Algorithms', 'DSA'], level: 'Intermediate'
         },
+        {
+            id: 'dsa_3',
+            title: 'Dynamic Programming - 0/1 Knapsack Problem',
+            description: 'Step-by-step derivation of the Knapsack problem using DP.',
+            organization: { primaryPath: 'subject', subjectPath: { subject: 'Computer Science', coreTopic: 'Algorithms', subtopic: 'Dynamic Programming', resourceTitle: 'Knapsack Problem' } },
+            uploadedBy: 'Abdul Bari', uploadedAt: '2024-03-05T09:15:00Z', views: 8900, likes: 780, downloads: 500,
+            videoUrl: 'https://www.youtube.com/embed/nzA2yrOV3Lw',
+            tags: ['Dynamic Programming', 'Knapsack', 'Optimization', 'DSA', 'Algorithms'], level: 'Advanced'
+        },
+
+        // --- DATA SCIENCE & AI ---
+        {
+            id: 'data_1',
+            title: 'Data Visualization with Python (Matplotlib & Seaborn)',
+            description: 'Learn to create stunning plots and charts using Python libraries.',
+            organization: { primaryPath: 'subject', subjectPath: { subject: 'Data Science', coreTopic: 'Visualization', subtopic: 'Python', resourceTitle: 'Data Viz Guide' } },
+            uploadedBy: 'Krish Naik', uploadedAt: '2024-02-12T10:00:00Z', views: 15600, likes: 1200, downloads: 450,
+            videoUrl: 'https://www.youtube.com/embed/O3682E87f70',
+            tags: ['Data Visualization', 'Python', 'Matplotlib', 'Seaborn', 'Data Science'], level: 'Beginner'
+        },
+        {
+            id: 'data_2',
+            title: 'Pandas & Numpy Complete Tutorial',
+            description: 'Data analysis and manipulation mastery with Pandas.',
+            organization: { primaryPath: 'channel', channelPath: { channelName: 'CodeBasics', playlistName: 'Data Science', topic: 'Pandas', resourceTitle: 'Pandas Tutorial' } },
+            uploadedBy: 'CodeBasics', uploadedAt: '2024-01-25T14:30:00Z', views: 25000, likes: 2100, downloads: 980,
+            videoUrl: 'https://www.youtube.com/embed/vmEHCJofslg',
+            tags: ['Data Analysis', 'Python', 'Pandas', 'Numpy', 'Data'], level: 'Intermediate'
+        },
+
+        // --- WEB DEVELOPMENT ---
+        {
+            id: 'web_1',
+            title: 'React Hooks Complete Tutorial',
+            description: 'Master useState, useEffect, and custom hooks in modern React.',
+            organization: { primaryPath: 'channel', channelPath: { channelName: 'Web Dev Simplified', playlistName: 'React Course', topic: 'React', resourceTitle: 'Hooks Tutorial' } },
+            uploadedBy: 'Web Dev Simplified', uploadedAt: '2024-01-20T16:00:00Z', views: 12000, likes: 1500, downloads: 800,
+            videoUrl: 'https://www.youtube.com/embed/hQAHSlTtcmY',
+            tags: ['React', 'Hooks', 'Frontend', 'JavaScript', 'Web Development'], level: 'Intermediate'
+        },
+        {
+            id: 'web_2',
+            title: 'Next.js 14 Crash Course',
+            description: 'Build a full-stack app with Next.js 14, Server Actions, and Tailwind CSS.',
+            organization: { primaryPath: 'channel', channelPath: { channelName: 'Traversy Media', playlistName: 'Next.js', topic: 'Next.js', resourceTitle: 'Next.js 14 Tutorial' } },
+            uploadedBy: 'Traversy Media', uploadedAt: '2024-02-28T11:45:00Z', views: 9500, likes: 920, downloads: 450,
+            videoUrl: 'https://www.youtube.com/embed/ZVnjOPwW4ZA',
+            tags: ['Next.js', 'React', 'Full Stack', 'Tailwind', 'Web Development'], level: 'Advanced'
+        },
+        {
+            id: 'web_3',
+            title: 'CSS Flexbox & Grid Masterclass',
+            description: 'Learn modern CSS layouts with Flexbox and Grid fundamentals.',
+            organization: { primaryPath: 'channel', channelPath: { channelName: 'Kevin Powell', playlistName: 'CSS', topic: 'CSS', resourceTitle: 'Layouts' } },
+            uploadedBy: 'Kevin Powell', uploadedAt: '2024-01-05T08:30:00Z', views: 7800, likes: 600, downloads: 300,
+            videoUrl: 'https://www.youtube.com/embed/3YM95p_LMco',
+            tags: ['CSS', 'Flexbox', 'Grid', 'Web Design', 'Frontend'], level: 'Beginner'
+        },
+
+        // --- SCIENCE (PHYSICS/CHEMISTRY) ---
+        {
+            id: 'sci_1',
+            title: 'Quantum Physics - Wave Particle Duality',
+            description: 'Introduction to Quantum Mechanics and the double-slit experiment.',
+            organization: { primaryPath: 'subject', subjectPath: { subject: 'Physics', coreTopic: 'Quantum Mechanics', subtopic: 'Wave Theory', resourceTitle: 'Quantum Basics' } },
+            uploadedBy: 'Veritasium', uploadedAt: '2023-12-15T10:00:00Z', views: 45000, likes: 3200, downloads: 1500,
+            videoUrl: 'https://www.youtube.com/embed/p7bzE1E5PMY',
+            tags: ['Physics', 'Quantum', 'Science', 'Mechanics'], level: 'Advanced'
+        },
+        {
+            id: 'sci_2',
+            title: 'Organic Chemistry - Benzene & Aromaticity',
+            description: 'Understanding the structure of Benzene and aromatic compounds.',
+            organization: { primaryPath: 'subject', subjectPath: { subject: 'Chemistry', coreTopic: 'Organic Chemistry', subtopic: 'Hydrocarbons', resourceTitle: 'Benzene Structure' } },
+            uploadedBy: 'Professor Dave', uploadedAt: '2024-02-15T13:15:00Z', views: 3200, likes: 240, downloads: 90,
+            videoUrl: 'https://www.youtube.com/embed/7DjsD7Hcd9U',
+            tags: ['Chemistry', 'Organic', 'Benzene', 'Science', 'JEE', 'NEET'], level: 'Intermediate'
+        },
+
+        // --- MATHEMATICS ---
+        {
+            id: 'math_1',
+            title: 'Calculus: Derivatives Explained',
+            description: 'Intuitive understanding of derivatives and rates of change.',
+            organization: { primaryPath: 'subject', subjectPath: { subject: 'Mathematics', coreTopic: 'Calculus', subtopic: 'Derivatives', resourceTitle: 'Intro to Derivatives' } },
+            uploadedBy: '3Blue1Brown', uploadedAt: '2023-11-20T15:00:00Z', views: 89000, likes: 5600, downloads: 2100,
+            videoUrl: 'https://www.youtube.com/embed/9vKqVkMQHKk',
+            tags: ['Calculus', 'Math', 'Derivatives', 'Integration', 'Education'], level: 'Beginner'
+        },
+
+        // --- CLOUD & DEVOPS ---
+        {
+            id: 'cloud_1',
+            title: 'Docker for Beginners',
+            description: 'Containerize your applications with Docker - Full Course.',
+            organization: { primaryPath: 'channel', channelPath: { channelName: 'TechWorld with Nana', playlistName: 'DevOps', topic: 'Docker', resourceTitle: 'Docker Tutorial' } },
+            uploadedBy: 'TechWorld with Nana', uploadedAt: '2024-01-12T09:00:00Z', views: 15000, likes: 1100, downloads: 670,
+            videoUrl: 'https://www.youtube.com/embed/3c-iBn73dDE',
+            tags: ['Docker', 'DevOps', 'Containers', 'Cloud'], level: 'Beginner'
+        },
+        {
+            id: 'cloud_2',
+            title: 'AWS Basics - EC2 & S3',
+            description: 'Getting started with Amazon Web Services: EC2 instances and S3 storage.',
+            organization: { primaryPath: 'channel', channelPath: { channelName: 'FreeCodeCamp', playlistName: 'AWS', topic: 'Cloud Computing', resourceTitle: 'AWS Course' } },
+            uploadedBy: 'FreeCodeCamp', uploadedAt: '2024-03-01T12:00:00Z', views: 22000, likes: 1800, downloads: 950,
+            videoUrl: 'https://www.youtube.com/embed/ulprqHHWlng',
+            tags: ['AWS', 'Cloud', 'EC2', 'S3', 'Web Development'], level: 'Beginner'
+        },
+
+        // --- COMPETITIVE EXAMS ---
+        {
+            id: 'exam_1',
+            title: 'JEE Physics - Rotational Motion',
+            description: 'One shot revision for Rotational Motion for JEE Mains & Advanced.',
+            organization: { primaryPath: 'subject', subjectPath: { subject: 'Physics', coreTopic: 'Mechanics', subtopic: 'Rotation', resourceTitle: 'Rotation One Shot' } },
+            uploadedBy: 'Physics Wallah', uploadedAt: '2024-01-25T11:00:00Z', views: 45000, likes: 3500, downloads: 1200,
+            videoUrl: 'https://www.youtube.com/embed/6qgGq7z2qGQ',
+            tags: ['JEE', 'Physics', 'Mechanics', 'Exam Prep'], level: 'Advanced'
+        },
+
         // SUBJECT-WISE: OS Process Scheduling
         {
             id: 'content_4_subject',
@@ -641,6 +643,101 @@ const loadInitialContents = (): DemoContent[] => {
             likes: 176,
             downloads: 520,
             videoUrl: 'https://www.youtube.com/embed/fNk_zzaMoSs' // Working Eigenvalues video
+        },
+        // =================== NEW TAGGED CONTENT WITH LEVELS ===================
+        // Machine Learning
+        {
+            id: 'ml_linear_regression',
+            title: 'Linear Regression from Scratch',
+            description: 'Complete guide to linear regression, gradient descent, and cost functions',
+            organization: { primaryPath: 'subject', subjectPath: { subject: 'Computer Science', coreTopic: 'Machine Learning', subtopic: 'Regression', resourceTitle: 'Linear Regression' } },
+            uploadedBy: 'Andrew NG',
+            uploadedAt: '2024-03-01T10:00:00Z',
+            views: 5200,
+            likes: 420,
+            downloads: 890,
+            tags: ['machine_learning', 'linear_regression', 'regression', 'gradient_descent', 'python', 'sklearn'],
+            level: 'Beginner'
+        },
+        {
+            id: 'ml_logistic_regression',
+            title: 'Logistic Regression for Classification',
+            description: 'Binary classification using logistic regression with sigmoid function',
+            organization: { primaryPath: 'subject', subjectPath: { subject: 'Computer Science', coreTopic: 'Machine Learning', subtopic: 'Classification', resourceTitle: 'Logistic Regression' } },
+            uploadedBy: 'StatQuest',
+            uploadedAt: '2024-03-02T10:00:00Z',
+            views: 4800,
+            likes: 380,
+            downloads: 720,
+            tags: ['machine_learning', 'logistic_regression', 'classification', 'sigmoid', 'python'],
+            level: 'Beginner'
+        },
+        {
+            id: 'ml_neural_networks',
+            title: 'Neural Networks Fundamentals',
+            description: 'Perceptrons, activation functions, backpropagation, and training neural networks',
+            organization: { primaryPath: 'subject', subjectPath: { subject: 'Computer Science', coreTopic: 'Deep Learning', subtopic: 'Neural Networks', resourceTitle: 'NN Basics' } },
+            uploadedBy: '3Blue1Brown',
+            uploadedAt: '2024-03-04T10:00:00Z',
+            views: 8500,
+            likes: 890,
+            downloads: 1200,
+            tags: ['machine_learning', 'neural_networks', 'deep_learning', 'backpropagation', 'activation_functions'],
+            level: 'Intermediate'
+        },
+        // Web Development
+        {
+            id: 'web_html_basics',
+            title: 'HTML5 Complete Course',
+            description: 'HTML fundamentals, semantic elements, forms, and accessibility',
+            organization: { primaryPath: 'channel', channelPath: { channelName: 'Traversy Media', playlistName: 'Web Dev', topic: 'HTML', resourceTitle: 'HTML5 Course' } },
+            uploadedBy: 'Brad Traversy',
+            uploadedAt: '2024-03-06T10:00:00Z',
+            views: 12000,
+            likes: 1100,
+            downloads: 2500,
+            tags: ['web_development', 'html', 'html5', 'frontend', 'semantic_html'],
+            level: 'Beginner'
+        },
+        {
+            id: 'web_react_intro',
+            title: 'React.js Complete Tutorial',
+            description: 'Components, hooks, state management, and building modern React apps',
+            organization: { primaryPath: 'channel', channelPath: { channelName: 'Codevolution', playlistName: 'React', topic: 'React', resourceTitle: 'React Tutorial' } },
+            uploadedBy: 'Codevolution',
+            uploadedAt: '2024-03-09T10:00:00Z',
+            views: 18000,
+            likes: 1800,
+            downloads: 4100,
+            tags: ['web_development', 'react', 'javascript', 'frontend', 'hooks', 'jsx'],
+            level: 'Intermediate'
+        },
+        // Data Structures
+        {
+            id: 'dsa_linked_list',
+            title: 'Linked Lists Complete Guide',
+            description: 'Singly, doubly, circular linked lists with insertion, deletion operations',
+            organization: { primaryPath: 'subject', subjectPath: { subject: 'Computer Science', coreTopic: 'Data Structures', subtopic: 'Linked List', resourceTitle: 'Linked Lists' } },
+            uploadedBy: 'Jenny Lectures',
+            uploadedAt: '2024-03-15T10:00:00Z',
+            views: 5400,
+            likes: 460,
+            downloads: 1200,
+            tags: ['data_structures', 'linked_list', 'dsa', 'pointers', 'algorithm'],
+            level: 'Beginner'
+        },
+        {
+            id: 'dsa_graph_algorithms',
+            title: 'Graph Algorithms - BFS & DFS',
+            description: 'Breadth-First Search, Depth-First Search, and graph traversal techniques',
+            organization: { primaryPath: 'subject', subjectPath: { subject: 'Computer Science', coreTopic: 'Algorithms', subtopic: 'Graphs', resourceTitle: 'Graph Algorithms' } },
+            uploadedBy: 'William Fiset',
+            uploadedAt: '2024-03-18T10:00:00Z',
+            views: 4100,
+            likes: 350,
+            downloads: 800,
+            tags: ['data_structures', 'graphs', 'algorithms', 'bfs', 'dfs', 'dsa'],
+            level: 'Advanced'
         }
     ];
 };

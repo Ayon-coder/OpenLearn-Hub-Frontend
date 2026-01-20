@@ -18,6 +18,9 @@ export interface CurriculumFormData {
     time_commitment: string;
     learning_objectives: string;
     learning_style: 'video-heavy' | 'hands-on' | 'reading' | 'mixed';
+    // New fields
+    interests?: string;
+    exam_date?: string;
 }
 
 export interface QuizQuestion {
@@ -25,25 +28,57 @@ export interface QuizQuestion {
     options: string[];
     correct_answer: string;
     explanation: string;
+    difficulty?: 'easy' | 'medium' | 'hard';
+    question_type?: 'conceptual' | 'numerical' | 'mcq' | 'assertion-reasoning';
+}
+
+export interface MatchingCriteria {
+    topic_slug: string;
+    subtopic_slugs: string[];
+    difficulty_level: 'beginner' | 'intermediate' | 'advanced';
+    keywords: string[];
+    domain: string;
+    exam_context: string;
+    alternative_names?: string[];
+}
+
+export interface PracticeProblem {
+    recommended_count: number;
+    difficulty_distribution: {
+        easy: number;
+        medium: number;
+        hard: number;
+    };
+    problem_types: string[];
 }
 
 export interface Course {
     position: number;
     title: string;
     description: string;
-    topics: string[];
-    video_count: number;
-    duration_hours: number;
-    prerequisites: string[];
+    topics?: string[]; // Kept for backward compatibility
+    video_count?: number; // Kept for backward compatibility
+    expected_video_count?: number; // New field
+    duration_hours?: number; // Kept for backward compatibility
+    estimated_hours?: number; // New field
+    prerequisites?: string[]; // Kept for backward compatibility
+    prerequisite_courses?: string[]; // New field
     learning_outcomes: string[];
     quiz: QuizQuestion[];
-    hands_on_project: string;
+    hands_on_project?: string;
+
+    // Universal / Exam Fields
+    matching_criteria?: MatchingCriteria;
+    exam_relevance?: string;
+    weightage?: string; // e.g. "15% of marks"
+    practice_problems?: PracticeProblem;
 }
 
 export interface LearningTier {
     tier_description: string;
-    total_videos: number;
-    estimated_hours: number;
+    total_videos?: number; // Legacy
+    total_estimated_hours: number;
+    tier_relevance: string;
     courses: Course[];
 }
 
@@ -51,17 +86,24 @@ export interface ProgressMilestone {
     milestone_name: string;
     tier: string;
     percentage: number;
-    videos_completed: number;
+    courses_completed?: number;
+    videos_completed?: number; // Legacy
     skills_unlocked: string[];
-    next_step: string;
+    next_step?: string;
+    exam_readiness?: string;
 }
 
 export interface StudentAnalysis {
-    profile_summary: string;
-    starting_tier: string;
-    reasoning: string;
-    estimated_completion_weeks: number;
-    weekly_hours_needed: number;
+    profile_summary?: string; // Legacy
+    summary?: string; // New field
+    starting_tier?: string; // Legacy
+    recommended_start_tier?: string; // New field
+    reasoning?: string; // Legacy
+    estimated_completion_weeks?: number; // Legacy
+    estimated_weeks?: number; // New field
+    weekly_hours_needed?: number; // Legacy
+    weekly_hours?: number; // New field
+    special_notes?: string;
 }
 
 export interface Personalization {
@@ -85,17 +127,78 @@ export interface CareerOutcomes {
     next_learning_paths: string[];
 }
 
+// New Exam Strategy Types
+export interface ExamStrategy {
+    study_schedule?: {
+        weeks_until_exam: number;
+        [key: string]: any;
+    };
+    topic_prioritization?: Array<{
+        topic: string;
+        importance: string;
+        recommended_hours: number;
+    }>;
+    mock_test_schedule?: string;
+}
+
+export interface ResourceRecommendation {
+    topic: string;
+    difficulty: string;
+    recommended_platforms: string[];
+    search_query: string;
+    youtube_channels?: string[];
+    books?: string[];
+    websites?: string[];
+}
+
+export interface SuccessMetrics {
+    for_skills?: {
+        beginner_completion: string;
+        intermediate_completion: string;
+        advanced_completion: string;
+    };
+    for_exams?: {
+        beginner_completion: string;
+        intermediate_completion: string;
+        advanced_completion: string;
+    };
+}
+
 export interface CurriculumData {
-    student_analysis: StudentAnalysis;
-    learning_path: {
+    student_analysis?: StudentAnalysis; // Legacy
+    student_profile?: StudentAnalysis; // New
+    learning_path?: { // Legacy
         beginner: LearningTier;
         intermediate: LearningTier;
         advanced: LearningTier;
     };
+    curriculum?: { // New
+        beginner: LearningTier;
+        intermediate: LearningTier;
+        advanced: LearningTier;
+    };
+
     progress_milestones: ProgressMilestone[];
-    personalization: Personalization;
-    final_project: FinalProject;
-    career_outcomes: CareerOutcomes;
+    personalization?: Personalization; // Legacy
+    final_project?: FinalProject; // Legacy/Optional
+    career_outcomes?: CareerOutcomes; // Legacy/Optional
+
+    // New Fields
+    learning_goal_analysis?: {
+        detected_domain: string;
+        primary_topic: string;
+        subtopics: string[];
+        exam_specific: boolean;
+        exam_name: string;
+        complexity_level: string;
+    };
+    exam_strategy?: {
+        if_exam_prep?: ExamStrategy;
+    };
+    resource_recommendations?: {
+        if_no_internal_videos?: ResourceRecommendation[];
+    };
+    success_metrics?: SuccessMetrics;
 }
 
 export interface SavedCurriculum {

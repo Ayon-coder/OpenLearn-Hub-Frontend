@@ -41,6 +41,7 @@ The **OpenLearn Hub Frontend** is a cutting-edge educational web application des
 - **Mentor Mode**: Interactive conversations with AI for personalized learning guidance
 - **Concept Mirror**: AI-powered concept analysis and feedback system
 - **AI Curriculum Generator**: Personalized learning paths based on your goals, level, and style
+- **Persistent History**: Automatically save and resume your generated learning paths from the Dashboard
 
 ### 🎓 Learning Paths
 - **Pre-built Paths**: Curated learning journeys for Tech Skills, BSc Subjects, and Competitive Exams
@@ -213,8 +214,9 @@ npm run preview
 | `/quiz/create` | Quiz Creator | Yes |
 | `/notes/upload` | Upload Notes | Yes |
 | `/learning-paths` | Browse Learning Paths | No |
+| `/learning-paths` | Browse Learning Paths | No |
 | `/curriculum/generate` | Generate AI Curriculum | Yes |
-| `/curriculum/:id` | View Generated Curriculum | Yes |
+| `/curriculum/result/:id` | View/Resume Curriculum | Yes |
 | `/admin/login` | Admin Login | No |
 | `/admin/dashboard` | Admin Dashboard | Admin Only |
 
