@@ -27,6 +27,23 @@ export const addDemoContent = (content: DemoContent) => {
     }
 };
 
+// Refresh DEMO_CONTENTS from localStorage (for cross-tab or page refresh scenarios)
+export const refreshContents = (): DemoContent[] => {
+    try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            // Update the DEMO_CONTENTS array in-place
+            DEMO_CONTENTS.length = 0;
+            DEMO_CONTENTS.push(...parsed);
+            return DEMO_CONTENTS;
+        }
+    } catch (e) {
+        console.error('Failed to refresh from localStorage', e);
+    }
+    return DEMO_CONTENTS;
+};
+
 // Initialize with saved content or default
 const loadInitialContents = (): DemoContent[] => {
     try {

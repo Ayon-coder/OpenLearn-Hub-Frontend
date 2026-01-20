@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     TrendingUp,
@@ -8,9 +8,10 @@ import {
     Users,
     Clock,
     GraduationCap,
-    ShieldCheck
+    ShieldCheck,
+    RefreshCw
 } from 'lucide-react';
-import { DEMO_CONTENTS, DemoContent } from '@/data/demoContents';
+import { DEMO_CONTENTS, DemoContent, refreshContents } from '@/data/demoContents';
 import { EnhancedContentCard } from '@/components/content/EnhancedContentCard';
 import { CourseGatekeeperModal } from '@/components/modals/CourseGatekeeperModal';
 
@@ -30,6 +31,27 @@ export const TrendingNotesPage: React.FC = () => {
     // Gatekeeper modal state
     const [gatekeeperOpen, setGatekeeperOpen] = useState(false);
     const [selectedGatedContent, setSelectedGatedContent] = useState<DemoContent | null>(null);
+
+    // Content list state - refreshes from localStorage
+    const [contentList, setContentList] = useState<DemoContent[]>(DEMO_CONTENTS);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
+    // Refresh content from localStorage
+    const handleRefresh = useCallback(() => {
+        setIsRefreshing(true);
+        const freshContents = refreshContents();
+        setContentList([...freshContents]);
+        setTimeout(() => setIsRefreshing(false), 500);
+    }, []);
+
+    // Refresh on mount and when window gains focus (to catch new uploads)
+    useEffect(() => {
+        handleRefresh();
+
+        const onFocus = () => handleRefresh();
+        window.addEventListener('focus', onFocus);
+        return () => window.removeEventListener('focus', onFocus);
+    }, [handleRefresh]);
 
     // Close dropdown on navigation/click outside
     useEffect(() => {
@@ -94,14 +116,14 @@ export const TrendingNotesPage: React.FC = () => {
         return 0;
     };
 
-    const displayedContent = DEMO_CONTENTS
+    const displayedContent = contentList
         .filter(filterContent)
         .sort(sortContent);
 
     // Extract unique subjects for the tag filter
-    const subjects = Array.from(new Set(DEMO_CONTENTS.map(c => c.organization.subjectPath?.subject).filter(Boolean)));
+    const subjects = Array.from(new Set(contentList.map(c => c.organization.subjectPath?.subject).filter(Boolean)));
     // Extract unique institutions
-    const institutions = Array.from(new Set(DEMO_CONTENTS.map(c => c.organization.universityPath?.university).filter(Boolean)));
+    const institutions = Array.from(new Set(contentList.map(c => c.organization.universityPath?.university).filter(Boolean)));
 
     return (
         <div className="space-y-8 pb-12 max-w-[1600px] mx-auto">
@@ -110,14 +132,24 @@ export const TrendingNotesPage: React.FC = () => {
                 <div className="absolute top-0 right-0 p-8 opacity-10">
                     <TrendingUp size={120} />
                 </div>
-                <div className="relative z-10">
-                    <h1 className="text-3xl font-black mb-2 flex items-center gap-3">
-                        <TrendingUp className="text-violet-200" />
-                        Trending Notes
-                    </h1>
-                    <p className="text-violet-100 font-medium max-w-xl">
-                        Discover the most popular community contributions and top-rated course materials updated in real-time.
-                    </p>
+                <div className="relative z-10 flex items-start justify-between">
+                    <div>
+                        <h1 className="text-3xl font-black mb-2 flex items-center gap-3">
+                            <TrendingUp className="text-violet-200" />
+                            Trending Notes
+                        </h1>
+                        <p className="text-violet-100 font-medium max-w-xl">
+                            Discover the most popular community contributions and top-rated course materials updated in real-time.
+                        </p>
+                    </div>
+                    <button
+                        onClick={handleRefresh}
+                        disabled={isRefreshing}
+                        className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl text-sm font-bold transition-all disabled:opacity-50"
+                    >
+                        <RefreshCw size={16} className={isRefreshing ? 'animate-spin' : ''} />
+                        {isRefreshing ? 'Refreshing...' : 'Refresh'}
+                    </button>
                 </div>
             </div>
 
