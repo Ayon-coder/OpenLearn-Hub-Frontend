@@ -19,7 +19,7 @@ function findPlatformContent(topics: string[], title: string, level?: string, ma
     const STOP_WORDS = new Set([
         'and', 'or', 'the', 'a', 'an', 'in', 'on', 'at', 'to', 'for', 'of', 'with',
         'introduction', 'intro', 'basics', 'basic', 'advanced', 'complete', 'guide',
-        'tutorial', 'course', 'learn', 'learning', 'how', 'what', 'why', 'programming',
+        'tutorial', 'course', 'learn', 'how', 'what', 'why',
         'development', 'design', 'engineering', 'science', 'scratch', 'zero', 'hero',
         'mastery', 'bootcamp', 'full', 'stack', 'concepts', 'principles',
         'implementation', 'application', 'applications', 'examples', 'topic', 'model'
