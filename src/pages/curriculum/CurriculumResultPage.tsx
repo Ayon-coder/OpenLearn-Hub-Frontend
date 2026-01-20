@@ -5,7 +5,7 @@ import {
     CheckCircle2, PlayCircle, Award, Briefcase, ArrowLeft,
     Loader2, AlertCircle, GraduationCap, Code, Layers,
     ChevronRight, FileText, Lightbulb, ExternalLink, Play, Youtube,
-    Library // Added missing import
+    Library, Scale, Crosshair, Link
 } from 'lucide-react';
 import { authService } from '@/services/auth/authService';
 import { curriculumService, SavedCurriculum, Course, LearningTier } from '@/services/curriculum/curriculumService';
@@ -168,13 +168,13 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, tierColor, level }) => 
                     {(course.weightage || course.exam_relevance) && (
                         <div className="flex flex-wrap gap-2 mb-4">
                             {course.weightage && (
-                                <span className="px-3 py-1 bg-yellow-50 text-yellow-700 rounded-full text-xs font-bold border border-yellow-200 shadow-sm">
-                                    ⚖️ {course.weightage} Weightage
+                                <span className="px-3 py-1 bg-yellow-50 text-yellow-700 rounded-full text-xs font-bold border border-yellow-200 shadow-sm flex items-center gap-1">
+                                    <Scale size={12} /> {course.weightage} Weightage
                                 </span>
                             )}
                             {course.exam_relevance && (
-                                <span className="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-xs font-bold border border-purple-200 shadow-sm">
-                                    🎯 {course.exam_relevance}
+                                <span className="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-xs font-bold border border-purple-200 shadow-sm flex items-center gap-1">
+                                    <Crosshair size={12} /> {course.exam_relevance}
                                 </span>
                             )}
                         </div>
@@ -241,7 +241,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, tierColor, level }) => 
                                                         <div className="flex-1">
                                                             {/* Badge */}
                                                             <div className="inline-flex items-center space-x-1 px-3 py-1.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl text-xs font-black shadow-lg shadow-green-200/50 mb-3">
-                                                                <span>✓</span>
+                                                                <CheckCircle2 size={12} />
                                                                 <span>On Platform</span>
                                                             </div>
 
@@ -282,7 +282,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, tierColor, level }) => 
                                     {/* External Resources */}
                                     <div className="pt-3">
                                         <p className="text-xs font-bold text-gray-400 mb-3 flex items-center space-x-1">
-                                            <span>🔗</span>
+                                            <Link size={12} />
                                             <span>External Resources</span>
                                         </p>
                                         <div className="grid grid-cols-2 gap-3">

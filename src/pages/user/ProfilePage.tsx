@@ -161,7 +161,9 @@ export const ProfilePage: React.FC = () => {
                   <AlertTriangle size={24} className="text-red-200" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-black text-red-100 mb-2">⚠️ Community Guidelines</h3>
+                  <h3 className="text-lg font-black text-red-100 mb-2 flex items-center gap-2">
+                    <AlertTriangle size={24} className="text-red-200" /> Community Guidelines
+                  </h3>
                   <p className="text-sm text-red-200 font-medium leading-relaxed">
                     Spam, plagiarism, or any form of misconduct will result in <span className="font-black text-white">permanent account suspension</span> without warning.
                   </p>

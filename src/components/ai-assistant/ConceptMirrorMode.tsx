@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { analyzeConceptExplanation, ConceptAnalysis } from '@/services/ai/aiAssistantService';
-import { CheckCircle2, XCircle, AlertTriangle, HelpCircle, FileText, Sparkles, ArrowRight, RefreshCw, Send, BookOpen } from 'lucide-react';
+import { CheckCircle2, XCircle, AlertTriangle, HelpCircle, FileText, Sparkles, ArrowRight, RefreshCw, Send, BookOpen, Zap } from 'lucide-react';
 
 const EXAMPLE_CONCEPTS = [
     { name: 'Binary Search', description: 'Efficient search' },
@@ -62,7 +62,7 @@ export const ConceptMirrorMode: React.FC = () => {
                 <div className="flex items-center justify-between px-6 py-4 bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-10">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-purple-100/50 rounded-xl flex items-center justify-center text-xl">
-                            🪞
+                            <Zap className="w-6 h-6 text-purple-600" />
                         </div>
                         <div>
                             <div className="text-sm text-gray-500 font-medium uppercase tracking-wider">Analysis Result</div>
@@ -201,7 +201,7 @@ export const ConceptMirrorMode: React.FC = () => {
         <div className="flex flex-col h-full bg-gradient-to-b from-white to-gray-50/80 overflow-y-auto">
             <div className="flex-1 flex flex-col items-center p-8 animate-in fade-in duration-700">
                 <div className="w-20 h-20 bg-purple-50 rounded-3xl flex items-center justify-center mb-6 shadow-sm text-4xl">
-                    🪞
+                    <Zap className="w-10 h-10 text-purple-600" />
                 </div>
                 <h1 className="text-3xl font-bold text-gray-900 mb-3 tracking-tight">Concept Mirror</h1>
                 <p className="text-gray-500 text-center max-w-md mb-10 text-lg">

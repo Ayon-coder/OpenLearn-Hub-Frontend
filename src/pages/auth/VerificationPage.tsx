@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     CheckCircle, Clock, XCircle, AlertCircle,
-    Upload, ArrowLeft, Trash2
+    Upload, ArrowLeft, Trash2, Lightbulb
 } from 'lucide-react';
 import { authService } from '@/services/auth/authService';
 import { User, VerificationStatus } from '@/types';
@@ -281,7 +281,10 @@ export const VerificationPage: React.FC = () => {
 
                                 {/* Tips for Improving Trust */}
                                 <div className="mt-6 bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl border border-blue-100 p-6">
-                                    <h3 className="font-black text-gray-900 mb-3">💡 Tips to Improve Your Trust Score</h3>
+                                    <h3 className="font-black text-gray-900 mb-3 flex items-center gap-2">
+                                        <Lightbulb className="w-5 h-5 text-yellow-500" />
+                                        Tips to Improve Your Trust Score
+                                    </h3>
                                     <ul className="space-y-2 text-sm text-gray-700">
                                         <li className="flex items-start space-x-2">
                                             <span className="text-blue-600 font-bold">•</span>

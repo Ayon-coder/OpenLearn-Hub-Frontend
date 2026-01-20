@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, LogIn, UserPlus, Lock } from 'lucide-react';
+import { X, LogIn, UserPlus, Lock, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface AuthRequiredModalProps {
@@ -57,23 +57,23 @@ export const AuthRequiredModal: React.FC<AuthRequiredModalProps> = ({
                         <h3 className="font-black text-blue-900 mb-2">With a free account, you can:</h3>
                         <ul className="space-y-2 text-sm font-medium text-blue-700">
                             <li className="flex items-center space-x-2">
-                                <span className="text-blue-600">✓</span>
+                                <Check size={14} className="text-blue-600" />
                                 <span>Upload your own notes</span>
                             </li>
                             <li className="flex items-center space-x-2">
-                                <span className="text-blue-600">✓</span>
+                                <Check size={14} className="text-blue-600" />
                                 <span>Create and share quizzes</span>
                             </li>
                             <li className="flex items-center space-x-2">
-                                <span className="text-blue-600">✓</span>
+                                <Check size={14} className="text-blue-600" />
                                 <span>Organize notes in your personal drive</span>
                             </li>
                             <li className="flex items-center space-x-2">
-                                <span className="text-blue-600">✓</span>
+                                <Check size={14} className="text-blue-600" />
                                 <span>Access course materials</span>
                             </li>
                             <li className="flex items-center space-x-2">
-                                <span className="text-blue-600">✓</span>
+                                <Check size={14} className="text-blue-600" />
                                 <span>Unlimited downloads</span>
                             </li>
                         </ul>

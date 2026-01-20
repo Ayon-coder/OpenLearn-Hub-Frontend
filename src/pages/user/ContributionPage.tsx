@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Upload, FileText, FileQuestion, Eye, Calendar, CheckCircle, Clock, XCircle, Plus, Lock, Info } from 'lucide-react';
+import { Upload, FileText, FileQuestion, Eye, Calendar, CheckCircle, Clock, XCircle, Plus, Lock, Info, Medal, Lightbulb, ClipboardList, Hourglass } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '@/services/auth/authService';
 
@@ -96,7 +96,7 @@ export const ContributionPage: React.FC = () => {
                             </div>
                             <div>
                                 <h3 className="text-2xl font-black text-white mb-1">
-                                    Upload Notes {!canUploadNotes && '🔒'}
+                                    Upload Notes {!canUploadNotes && <Lock size={20} className="inline ml-1" />}
                                 </h3>
                                 <p className={canUploadNotes ? 'text-blue-100 font-medium' : 'text-gray-600 font-medium'}>
                                     {canUploadNotes ? 'Share your knowledge' : 'Locked - Silver+ only'}
@@ -142,7 +142,7 @@ export const ContributionPage: React.FC = () => {
                         <div className="flex items-start space-x-3">
                             <Info className="text-orange-600 flex-shrink-0 mt-1" size={24} />
                             <div>
-                                <h3 className="font-black text-orange-900 mb-2">🥉 Bronze Level - Build Your Trust to Upload</h3>
+                                <h3 className="font-black text-orange-900 mb-2 flex items-center gap-2"><Medal size={18} className="text-orange-600" /> Bronze Level - Build Your Trust to Upload</h3>
                                 <p className="text-sm text-orange-800 font-medium mb-3">
                                     You're currently at Bronze level (Trust Score: {user?.communityMetrics?.trustScore || 0}/100).
                                     To unlock note uploads, reach Silver level (40+ trust score) by:
@@ -153,8 +153,8 @@ export const ContributionPage: React.FC = () => {
                                     <li>• Receive upvotes on your comments</li>
                                     <li>• Engage positively with the community</li>
                                 </ul>
-                                <p className="text-xs text-orange-700 font-bold">
-                                    💡 Your trust score updates automatically based on community engagement!
+                                <p className="text-xs text-orange-700 font-bold flex items-center gap-1">
+                                    <Lightbulb size={14} /> Your trust score updates automatically based on community engagement!
                                 </p>
                             </div>
                         </div>
@@ -243,8 +243,8 @@ export const ContributionPage: React.FC = () => {
 
                                     {note.status === 'pending' && (
                                         <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mt-4">
-                                            <p className="text-sm text-yellow-800 font-medium">
-                                                ⏳ Your content is under review. This usually takes 24-48 hours.
+                                            <p className="text-sm text-yellow-800 font-medium flex items-center gap-2">
+                                                <Hourglass size={14} /> Your content is under review. This usually takes 24-48 hours.
                                             </p>
                                         </div>
                                     )}
@@ -320,7 +320,7 @@ export const ContributionPage: React.FC = () => {
 
                 {/* Info Notice */}
                 <div className="mt-8 bg-blue-50 border border-blue-200 rounded-2xl p-6">
-                    <h4 className="font-black text-blue-900 mb-2">📝 Contribution Guidelines</h4>
+                    <h4 className="font-black text-blue-900 mb-2 flex items-center gap-2"><ClipboardList size={18} /> Contribution Guidelines</h4>
                     <ul className="text-sm text-blue-800 space-y-1 font-medium">
                         <li>• All uploads require admin verification before going live</li>
                         <li>• Provide accurate source references for better trust levels</li>

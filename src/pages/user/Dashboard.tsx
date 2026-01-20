@@ -25,7 +25,10 @@ import {
   Sparkles,
   ArrowRight,
   GraduationCap,
-  CalendarDays
+  CalendarDays,
+  Rocket,
+  Lightbulb,
+  Hand
 } from 'lucide-react';
 import { driveSyncService } from '@/services/drive/driveSyncService';
 import { curriculumService, SavedCurriculum } from '@/services/curriculum/curriculumService';
@@ -92,8 +95,9 @@ const ActionCard: React.FC<ActionCardProps> = ({ icon, title, description, onCli
             </div>
             <p className="leading-relaxed">{lockReason}</p>
             {lockReason.includes('500') && (
-              <div className="mt-2 text-[10px] text-gray-400 bg-white/5 rounded px-2 py-1">
-                💡 Tip: Upload notes & get likes!
+              <div className="mt-2 text-[10px] text-gray-400 bg-white/5 rounded px-2 py-1 flex items-center justify-center gap-1">
+                <Lightbulb size={12} className="text-yellow-400" />
+                <span>Tip: Upload notes & get likes!</span>
               </div>
             )}
           </div>
@@ -283,7 +287,9 @@ export const Dashboard: React.FC = () => {
 
             <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
               <div>
-                <h1 className="text-3xl font-black mb-2 tracking-tight">Welcome back, {user.name}! 👋</h1>
+                <h1 className="text-3xl font-black mb-2 tracking-tight flex items-center gap-2">
+                  Welcome back, {user.name}! <Hand className="w-8 h-8 text-yellow-400" />
+                </h1>
                 <p className="text-gray-300 font-medium mb-6 flex items-center gap-2">
                   You are logged in as a <span className="text-white font-bold capitalize bg-white/10 px-2 py-0.5 rounded-lg border border-white/10">{user.role.replace('_', ' ')}</span>
                 </p>
@@ -328,7 +334,9 @@ export const Dashboard: React.FC = () => {
           </div>
         ) : (
           <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-8 text-white shadow-xl shadow-blue-200">
-            <h1 className="text-3xl font-black mb-2">Welcome to OpenLearn Hub! 🚀</h1>
+            <h1 className="text-3xl font-black mb-2 flex items-center gap-3">
+              Welcome to OpenLearn Hub! <Rocket className="w-8 h-8 text-blue-200" />
+            </h1>
             <p className="text-blue-100 font-medium">Join our community to start your learning journey.</p>
           </div>
         )}

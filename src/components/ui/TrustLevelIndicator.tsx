@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { TrendingUp, Award } from 'lucide-react';
+import { TrendingUp, Award, PartyPopper, Check, X } from 'lucide-react';
 import { CommunityMetrics } from '@/types';
 import { trustLevelService } from '@/services/user/trustLevelService';
 
@@ -86,7 +86,7 @@ export const TrustLevelIndicator: React.FC<TrustLevelIndicatorProps> = ({
                 {metrics.trustLevel === 'gold' && (
                     <div className="flex items-center space-x-2 text-yellow-700">
                         <Award size={16} />
-                        <span className="text-xs font-bold">Maximum level achieved! 🎉</span>
+                        <span className="text-xs font-bold flex items-center gap-1">Maximum level achieved! <PartyPopper size={14} /></span>
                     </div>
                 )}
             </div>
@@ -131,8 +131,8 @@ export const TrustLevelIndicator: React.FC<TrustLevelIndicatorProps> = ({
 
                     {/* Upload Permission Status */}
                     <div className={`mt-4 p-3 rounded-xl border ${metrics.canUploadNotes
-                            ? 'bg-green-50 border-green-200'
-                            : 'bg-orange-50 border-orange-200'
+                        ? 'bg-green-50 border-green-200'
+                        : 'bg-orange-50 border-orange-200'
                         }`}>
                         <div className="flex items-center justify-between">
                             <span className={`text-sm font-bold ${metrics.canUploadNotes ? 'text-green-700' : 'text-orange-700'
@@ -140,10 +140,10 @@ export const TrustLevelIndicator: React.FC<TrustLevelIndicatorProps> = ({
                                 Upload Permission
                             </span>
                             <span className={`text-xs font-black px-2 py-1 rounded-full ${metrics.canUploadNotes
-                                    ? 'bg-green-100 text-green-700'
-                                    : 'bg-orange-100 text-orange-700'
+                                ? 'bg-green-100 text-green-700'
+                                : 'bg-orange-100 text-orange-700'
                                 }`}>
-                                {metrics.canUploadNotes ? '✓ Enabled' : '✗ Locked'}
+                                {metrics.canUploadNotes ? <><Check size={12} className="inline" /> Enabled</> : <><X size={12} className="inline" /> Locked</>}
                             </span>
                         </div>
                         {!metrics.canUploadNotes && (

@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PlusCircle, BookOpen, ArrowLeft, FileText, CheckCircle, Calendar } from 'lucide-react';
+import { PlusCircle, BookOpen, ArrowLeft, FileText, CheckCircle, Calendar, Medal, Lightbulb, Check } from 'lucide-react';
 import { authService } from '@/services/auth/authService';
 import { QuizPublishingGuard } from '@/components/quiz/QuizPublishingGuard';
 import { ChatbotVerificationModal } from '@/components/modals/ChatbotVerificationModal';
@@ -203,7 +203,7 @@ export const QuizCreationPage: React.FC = () => {
                                         <BookOpen size={32} />
                                     </div>
                                     <div>
-                                        <h1 className="text-3xl font-black">🥉 Bronze Level</h1>
+                                        <h1 className="text-3xl font-black flex items-center gap-2"><Medal size={24} /> Bronze Level</h1>
                                         <p className="text-orange-100 font-medium">Quiz creation locked</p>
                                     </div>
                                 </div>
@@ -240,7 +240,7 @@ export const QuizCreationPage: React.FC = () => {
 
                                 <div className="bg-gray-900 rounded-2xl p-4 mb-6 text-white">
                                     <div className="flex items-start space-x-3">
-                                        <span className="text-2xl">💡</span>
+                                        <Lightbulb size={24} />
                                         <div>
                                             <p className="text-sm font-medium text-gray-300">
                                                 Your current trust score: <span className="font-black text-white">{user.communityMetrics?.trustScore || 0}</span>/100
@@ -377,7 +377,7 @@ export const QuizCreationPage: React.FC = () => {
                                                             <FileText className="text-blue-600" size={20} />
                                                             {note.hasQuiz && (
                                                                 <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">
-                                                                    Quiz Attached ✓
+                                                                    Quiz Attached <Check size={12} className="inline" />
                                                                 </span>
                                                             )}
                                                         </div>

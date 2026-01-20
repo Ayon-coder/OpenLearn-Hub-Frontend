@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ProtectedNoteViewer } from '@/components/content/ProtectedNoteViewer';
 import { authService } from '@/services/auth/authService';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
-import { Lock, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Lock, AlertTriangle, CheckCircle, Lightbulb } from 'lucide-react';
 
 import { DEMO_CONTENTS } from '@/data/demoContents';
 
@@ -112,7 +112,7 @@ export const CourseNoteAccessPage: React.FC = () => {
 
                         {/* Info Box */}
                         <div className="bg-amber-50 rounded-2xl p-4 border border-amber-100 flex items-start space-x-3">
-                            <div className="text-amber-500 mt-0.5 text-lg">💡</div>
+                            <Lightbulb size={16} className="text-amber-500 mt-0.5" />
                             <p className="text-xs text-amber-800 font-medium leading-relaxed">
                                 <span className="font-bold">Already enrolled?</span> Access these notes directly via the tracking link provided by your instructor in the {mockCourseNote.platform} course dashboard.
                             </p>

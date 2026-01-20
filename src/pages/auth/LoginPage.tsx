@@ -68,11 +68,12 @@ export const LoginPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6 relative overflow-hidden">
       {/* Website Manager Button - Top Right */}
+      {/* Website Manager Button - Top Right */}
       <button
         onClick={() => navigate('/admin/login')}
         className="absolute top-6 right-6 px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-bold hover:bg-gray-800 transition-all flex items-center space-x-2 shadow-lg z-10"
       >
-        <span>🔐</span>
+        <Lock size={16} />
         <span>Website Manager</span>
       </button>
 

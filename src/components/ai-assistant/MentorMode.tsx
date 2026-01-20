@@ -3,15 +3,15 @@ import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { sendMentorMessage, Message } from '@/services/ai/aiAssistantService';
-import { Send, RefreshCw, GraduationCap, User, Sparkles } from 'lucide-react';
+import { Send, RefreshCw, GraduationCap, User, Sparkles, Boxes, Zap, Globe, Code2, Bot, Database, BookOpen } from 'lucide-react';
 
 const POPULAR_TOPICS = [
-    { name: 'Data Structures', icon: '📊', description: 'Arrays, lists, trees, graphs' },
-    { name: 'Algorithms', icon: '⚡', description: 'Sorting, searching, recursion' },
-    { name: 'Web Development', icon: '🌐', description: 'HTML, CSS, JavaScript, React' },
-    { name: 'Python Basics', icon: '🐍', description: 'Variables, functions, loops' },
-    { name: 'Machine Learning', icon: '🤖', description: 'Models, training, prediction' },
-    { name: 'Database Design', icon: '💾', description: 'SQL, normalization, queries' },
+    { name: 'Data Structures', icon: Boxes, description: 'Arrays, lists, trees, graphs' },
+    { name: 'Algorithms', icon: Zap, description: 'Sorting, searching, recursion' },
+    { name: 'Web Development', icon: Globe, description: 'HTML, CSS, JavaScript, React' },
+    { name: 'Python Basics', icon: Code2, description: 'Variables, functions, loops' },
+    { name: 'Machine Learning', icon: Bot, description: 'Models, training, prediction' },
+    { name: 'Database Design', icon: Database, description: 'SQL, normalization, queries' },
 ];
 
 export const MentorMode: React.FC = () => {
@@ -94,7 +94,7 @@ export const MentorMode: React.FC = () => {
             <div className="flex flex-col h-full bg-gradient-to-b from-white to-gray-50/50 overflow-hidden relative">
                 <div className="flex-1 flex flex-col items-center justify-start pt-12 p-8 animate-in fade-in duration-700 overflow-y-auto custom-scrollbar pb-32">
                     <div className="w-20 h-20 bg-blue-50 rounded-3xl flex items-center justify-center mb-6 shadow-sm flex-shrink-0">
-                        <span className="text-4xl">🎓</span>
+                        <GraduationCap className="w-10 h-10 text-blue-600" />
                     </div>
                     <h1 className="text-3xl font-bold text-gray-900 mb-3 tracking-tight">AI Mentor</h1>
                     <p className="text-gray-500 text-center max-w-md mb-10 text-lg">
@@ -108,13 +108,16 @@ export const MentorMode: React.FC = () => {
                                 className="group flex flex-col items-center p-5 bg-white hover:bg-gradient-to-br hover:from-blue-50 hover:to-white rounded-2xl border border-gray-100 hover:border-blue-200 shadow-sm hover:shadow-md transition-all duration-300"
                                 onClick={() => handleTopicSelect(t.name)}
                             >
-                                <div className="text-3xl mb-3 transform group-hover:scale-110 transition-transform duration-300">{t.icon}</div>
+                                <div className="text-blue-600 mb-3 transform group-hover:scale-110 transition-transform duration-300 bg-blue-50 p-3 rounded-xl">
+                                    <t.icon className="w-6 h-6" />
+                                </div>
                                 <div className="font-semibold text-gray-900 text-sm mb-1">{t.name}</div>
                                 <div className="text-xs text-gray-500 text-center line-clamp-1">{t.description}</div>
                             </button>
                         ))}
                     </div>
                 </div>
+
 
                 <div className="p-6 bg-white/90 backdrop-blur-md border-t border-gray-100 absolute bottom-0 left-0 right-0 z-10 shadow-lg shadow-gray-100/50">
                     <form className="flex gap-3 max-w-2xl mx-auto" onSubmit={handleSendMessage}>
@@ -148,7 +151,7 @@ export const MentorMode: React.FC = () => {
             <div className="flex items-center justify-between px-6 py-4 bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-10">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-blue-100/50 rounded-xl flex items-center justify-center text-xl">
-                        📚
+                        <BookOpen className="w-5 h-5 text-blue-600" />
                     </div>
                     <div>
                         <div className="font-bold text-gray-900">{topic}</div>

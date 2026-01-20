@@ -222,170 +222,171 @@ export interface GenerateResult {
 // API FUNCTIONS
 // ============================================
 
+export const curriculumService = {
     /**
      * Generate a new curriculum using AI
      */
-    async generate(userId: string, formData: CurriculumFormData): Promise < GenerateResult > {
-    try {
-        const response = await fetch(`${API_BASE}/generate`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                userId,
-                ...formData
-            })
-        });
+    async generate(userId: string, formData: CurriculumFormData): Promise<GenerateResult> {
+        try {
+            const response = await fetch(`${API_BASE}/generate`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userId,
+                    ...formData
+                })
+            });
 
-        const result = await response.json();
+            const result = await response.json();
 
-        if(!response.ok) {
-    return {
-        success: false,
-        message: result.message || 'Failed to generate curriculum',
-        error: result.error
-    };
-}
+            if (!response.ok) {
+                return {
+                    success: false,
+                    message: result.message || 'Failed to generate curriculum',
+                    error: result.error
+                };
+            }
 
-// Invalidate user curricula cache
-invalidateCache(`user_curricula_${userId}`);
+            // Invalidate user curricula cache
+            invalidateCache(`user_curricula_${userId}`);
 
-return {
-    success: true,
-    message: result.message || 'Curriculum generated successfully',
-    curriculum: result.curriculum
-};
+            return {
+                success: true,
+                message: result.message || 'Curriculum generated successfully',
+                curriculum: result.curriculum
+            };
         } catch (error) {
-    console.error('Curriculum generation error:', error);
-    return {
-        success: false,
-        message: 'Connection failed. Please ensure the server is running.',
-        error: 'network_error'
-    };
-}
+            console.error('Curriculum generation error:', error);
+            return {
+                success: false,
+                message: 'Connection failed. Please ensure the server is running.',
+                error: 'network_error'
+            };
+        }
     },
 
     /**
      * Get a specific curriculum by ID
      */
-    async getById(curriculumId: string): Promise < SavedCurriculum | null > {
-    // Try cache first
-    const cached = getFromCache<SavedCurriculum>(`curriculum_${curriculumId}`);
-    if(cached) return cached;
+    async getById(curriculumId: string): Promise<SavedCurriculum | null> {
+        // Try cache first
+        const cached = getFromCache<SavedCurriculum>(`curriculum_${curriculumId}`);
+        if (cached) return cached;
 
-    try {
-        const response = await fetch(`${API_BASE}/${curriculumId}`);
-        const result = await response.json();
+        try {
+            const response = await fetch(`${API_BASE}/${curriculumId}`);
+            const result = await response.json();
 
-        if(!response.ok) {
-    console.error('Get curriculum error:', result.message);
-    return null;
-}
+            if (!response.ok) {
+                console.error('Get curriculum error:', result.message);
+                return null;
+            }
 
-// Save to cache
-saveToCache(`curriculum_${curriculumId}`, result.curriculum);
+            // Save to cache
+            saveToCache(`curriculum_${curriculumId}`, result.curriculum);
 
-return result.curriculum;
+            return result.curriculum;
         } catch (error) {
-    console.error('Get curriculum error:', error);
-    return null;
-}
+            console.error('Get curriculum error:', error);
+            return null;
+        }
     },
 
     /**
      * Get all curricula for a user
      */
-    async getUserCurricula(userId: string): Promise < SavedCurriculum[] > {
-    // Try cache first
-    const cached = getFromCache<SavedCurriculum[]>(`user_curricula_${userId}`);
-    if(cached) return cached;
+    async getUserCurricula(userId: string): Promise<SavedCurriculum[]> {
+        // Try cache first
+        const cached = getFromCache<SavedCurriculum[]>(`user_curricula_${userId}`);
+        if (cached) return cached;
 
-    try {
-        const response = await fetch(`${API_BASE}/user/${userId}`);
-        const result = await response.json();
+        try {
+            const response = await fetch(`${API_BASE}/user/${userId}`);
+            const result = await response.json();
 
-        if(!response.ok) {
-    console.error('Get user curricula error:', result.message);
-    return [];
-}
+            if (!response.ok) {
+                console.error('Get user curricula error:', result.message);
+                return [];
+            }
 
-// Save to cache
-saveToCache(`user_curricula_${userId}`, result.curricula || []);
+            // Save to cache
+            saveToCache(`user_curricula_${userId}`, result.curricula || []);
 
-return result.curricula || [];
+            return result.curricula || [];
         } catch (error) {
-    console.error('Get user curricula error:', error);
-    return [];
-}
+            console.error('Get user curricula error:', error);
+            return [];
+        }
     },
 
     /**
      * Delete a curriculum
      */
-    async delete (curriculumId: string, userId: string): Promise < boolean > {
-    try {
-        const response = await fetch(`${API_BASE}/${curriculumId}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ userId })
-        });
+    async delete(curriculumId: string, userId: string): Promise<boolean> {
+        try {
+            const response = await fetch(`${API_BASE}/${curriculumId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ userId })
+            });
 
-        if(response.ok) {
-    // Invalidate caches
-    invalidateCache(`curriculum_${curriculumId}`);
-    invalidateCache(`user_curricula_${userId}`);
-    return true;
-}
-return false;
+            if (response.ok) {
+                // Invalidate caches
+                invalidateCache(`curriculum_${curriculumId}`);
+                invalidateCache(`user_curricula_${userId}`);
+                return true;
+            }
+            return false;
         } catch (error) {
-    console.error('Delete curriculum error:', error);
-    return false;
-}
+            console.error('Delete curriculum error:', error);
+            return false;
+        }
     },
 
     /**
      * Update curriculum progress
      */
     async updateProgress(
-    curriculumId: string,
-    progress: Record<string, any>
-): Promise < SavedCurriculum | null > {
-    try {
-        const response = await fetch(`${API_BASE}/${curriculumId}/progress`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ progress })
-        });
+        curriculumId: string,
+        progress: Record<string, any>
+    ): Promise<SavedCurriculum | null> {
+        try {
+            const response = await fetch(`${API_BASE}/${curriculumId}/progress`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ progress })
+            });
 
-        const result = await response.json();
+            const result = await response.json();
 
-        if(!response.ok) {
-    console.error('Update progress error:', result.message);
-    return null;
-}
+            if (!response.ok) {
+                console.error('Update progress error:', result.message);
+                return null;
+            }
 
-// Invalidate or update cache
-// For simplicity, we invalidate to force refresh on next specific fetch
-invalidateCache(`curriculum_${curriculumId}`);
-// Also invalidate user list as it might show progress
-// Note: We'd need the userId to invalidate the list safely, 
-// but since we don't have it here easily and it's less critical for list view details usually
-// we will skip list invalidation or we can partially update if desired.
-// A clearer strategy is to just invalidate the specific item.
+            // Invalidate or update cache
+            // For simplicity, we invalidate to force refresh on next specific fetch
+            invalidateCache(`curriculum_${curriculumId}`);
+            // Also invalidate user list as it might show progress
+            // Note: We'd need the userId to invalidate the list safely, 
+            // but since we don't have it here easily and it's less critical for list view details usually
+            // we will skip list invalidation or we can partially update if desired.
+            // A clearer strategy is to just invalidate the specific item.
 
-// To update cache immediately:
-saveToCache(`curriculum_${curriculumId}`, result.curriculum);
+            // To update cache immediately:
+            saveToCache(`curriculum_${curriculumId}`, result.curriculum);
 
-return result.curriculum;
+            return result.curriculum;
         } catch (error) {
-    console.error('Update progress error:', error);
-    return null;
-}
+            console.error('Update progress error:', error);
+            return null;
+        }
     }
 };
 

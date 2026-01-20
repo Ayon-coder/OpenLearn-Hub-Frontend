@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Users, TrendingUp, Award, Info } from 'lucide-react';
+import { Users, TrendingUp, Award, Info, Medal, Check, X, Target } from 'lucide-react';
 import { trustLevelService } from '@/services/user/trustLevelService';
 
 interface CommunityContributorFormProps {
@@ -42,7 +42,7 @@ export const CommunityContributorForm: React.FC<CommunityContributorFormProps> =
                     <div className="bg-white rounded-xl p-4 border-2 border-orange-200">
                         <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center space-x-2">
-                                <span className="text-2xl">🥉</span>
+                                <Medal size={20} className="text-orange-600" />
                                 <span className="font-black text-orange-700">Bronze</span>
                             </div>
                             <span className="text-xs font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
@@ -53,8 +53,8 @@ export const CommunityContributorForm: React.FC<CommunityContributorFormProps> =
                             Score: {thresholds.bronze.minScore}-{thresholds.bronze.maxScore}
                         </p>
                         <p className="text-xs text-gray-500">
-                            ✓ Read and comment on notes<br />
-                            ✗ Cannot upload notes yet
+                            <Check size={10} className="inline text-green-600" /> Read and comment on notes<br />
+                            <X size={10} className="inline text-red-500" /> Cannot upload notes yet
                         </p>
                     </div>
 
@@ -62,7 +62,7 @@ export const CommunityContributorForm: React.FC<CommunityContributorFormProps> =
                     <div className="bg-white rounded-xl p-4 border-2 border-gray-300">
                         <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center space-x-2">
-                                <span className="text-2xl">🥈</span>
+                                <Medal size={20} className="text-gray-500" />
                                 <span className="font-black text-gray-700">Silver</span>
                             </div>
                             <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-full">
@@ -73,8 +73,8 @@ export const CommunityContributorForm: React.FC<CommunityContributorFormProps> =
                             Score: {thresholds.silver.minScore}-{thresholds.silver.maxScore}
                         </p>
                         <p className="text-xs text-gray-500 mb-2">
-                            ✓ Upload notes<br />
-                            ✓ Full community access
+                            <Check size={10} className="inline text-green-600" /> Upload notes<br />
+                            <Check size={10} className="inline text-green-600" /> Full community access
                         </p>
                         <p className="text-xs font-bold text-gray-700">
                             Requirements: {thresholds.silver.requirements}
@@ -85,7 +85,7 @@ export const CommunityContributorForm: React.FC<CommunityContributorFormProps> =
                     <div className="bg-white rounded-xl p-4 border-2 border-yellow-300">
                         <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center space-x-2">
-                                <span className="text-2xl">🥇</span>
+                                <Medal size={20} className="text-yellow-600" />
                                 <span className="font-black text-yellow-700">Gold</span>
                             </div>
                             <span className="text-xs font-bold text-purple-600 bg-purple-50 px-2 py-1 rounded-full">
@@ -96,9 +96,9 @@ export const CommunityContributorForm: React.FC<CommunityContributorFormProps> =
                             Score: {thresholds.gold.minScore}-{thresholds.gold.maxScore}
                         </p>
                         <p className="text-xs text-gray-500 mb-2">
-                            ✓ Priority review<br />
-                            ✓ Enhanced visibility<br />
-                            ✓ Community recognition
+                            <Check size={10} className="inline text-green-600" /> Priority review<br />
+                            <Check size={10} className="inline text-green-600" /> Enhanced visibility<br />
+                            <Check size={10} className="inline text-green-600" /> Community recognition
                         </p>
                         <p className="text-xs font-bold text-gray-700">
                             Requirements: {thresholds.gold.requirements}
@@ -139,7 +139,7 @@ export const CommunityContributorForm: React.FC<CommunityContributorFormProps> =
             {/* Info Banner */}
             <div className="bg-gray-900 rounded-2xl p-6 text-white">
                 <h4 className="font-black mb-2 flex items-center space-x-2">
-                    <span>🎯</span>
+                    <Target size={16} />
                     <span>Your Journey Starts Here</span>
                 </h4>
                 <p className="text-sm text-gray-300 mb-4">

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
     BookOpen, Clock, ChevronRight, Filter, Search,
     Play, ExternalLink, GraduationCap, Target, Sparkles,
-    User, Trash2, Loader2, Calendar
+    User, Trash2, Loader2, Calendar, CheckCircle2
 } from 'lucide-react';
 import {
     LEARNING_PATHS,
@@ -58,12 +58,12 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
                 <div className="flex-1">
                     {/* Badges */}
                     <div className="flex items-center flex-wrap gap-2 mb-3">
-                        <span className={`px-3 py-1 rounded-xl text-xs font-black shadow-sm ${platformColor}`}>
+                        <span className={`px - 3 py - 1 rounded - xl text - xs font - black shadow - sm ${platformColor} `}>
                             {platformIcon} {platformLabel}
                         </span>
                         {resolved.isInternal && (
-                            <span className="px-3 py-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl text-xs font-black shadow-sm">
-                                ✓ On Platform
+                            <span className="px-3 py-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl text-xs font-black shadow-sm flex items-center gap-1">
+                                <CheckCircle2 size={12} /> On Platform
                             </span>
                         )}
                     </div>
@@ -92,10 +92,10 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
 
                 {/* Play button with glow */}
                 <div className="relative ml-5">
-                    <div className={`p-4 rounded-2xl transition-all duration-300 ${resolved.isInternal
-                            ? 'bg-gradient-to-br from-blue-500 to-cyan-600 shadow-lg group-hover:shadow-blue-300/50 group-hover:scale-110'
-                            : 'bg-gray-100 group-hover:bg-gradient-to-br group-hover:from-gray-700 group-hover:to-gray-900 group-hover:scale-110'
-                        }`}>
+                    <div className={`p - 4 rounded - 2xl transition - all duration - 300 ${resolved.isInternal
+                        ? 'bg-gradient-to-br from-blue-500 to-cyan-600 shadow-lg group-hover:shadow-blue-300/50 group-hover:scale-110'
+                        : 'bg-gray-100 group-hover:bg-gradient-to-br group-hover:from-gray-700 group-hover:to-gray-900 group-hover:scale-110'
+                        } `}>
                         {resolved.isInternal ? (
                             <Play size={22} className="text-white" fill="white" />
                         ) : (
@@ -142,17 +142,17 @@ const PathCard: React.FC<PathCardProps> = ({ path, onSelect }) => {
             className="group relative bg-white rounded-3xl overflow-hidden hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-2 border border-gray-100"
         >
             {/* Gradient top bar */}
-            <div className={`h-1.5 bg-gradient-to-r ${levelColors[path.level]}`} />
+            <div className={`h - 1.5 bg - gradient - to - r ${levelColors[path.level]} `} />
 
             {/* Gradient background on hover */}
-            <div className={`absolute inset-0 bg-gradient-to-br ${levelBgColors[path.level]} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+            <div className={`absolute inset - 0 bg - gradient - to - br ${levelBgColors[path.level]} opacity - 0 group - hover: opacity - 100 transition - opacity duration - 500`} />
 
             <div className="relative p-7">
                 {/* Header */}
                 <div className="flex items-start justify-between mb-5">
                     <div className="relative">
-                        <div className="text-5xl filter drop-shadow-md transform group-hover:scale-110 transition-transform duration-300">
-                            {path.domainIcon}
+                        <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300">
+                            <BookOpen size={28} className="text-gray-600" />
                         </div>
                         {/* Glow effect */}
                         <div className={`absolute -inset-2 bg-gradient-to-r ${levelColors[path.level]} opacity-0 group-hover:opacity-20 blur-xl rounded-full transition-opacity duration-500`} />
@@ -188,7 +188,7 @@ const PathCard: React.FC<PathCardProps> = ({ path, onSelect }) => {
                     </div>
 
                     {/* Arrow button */}
-                    <div className={`p-2.5 rounded-xl bg-gray-100 group-hover:bg-gradient-to-r ${levelColors[path.level]} transition-all duration-300`}>
+                    <div className={`p - 2.5 rounded - xl bg - gray - 100 group - hover: bg - gradient - to - r ${levelColors[path.level]} transition - all duration - 300`}>
                         <ChevronRight size={18} className="text-gray-400 group-hover:text-white transition-colors" />
                     </div>
                 </div>
@@ -214,7 +214,7 @@ const PathDetail: React.FC<PathDetailProps> = ({ path, onBack }) => {
     return (
         <div>
             {/* Header */}
-            <div className={`bg-gradient-to-r ${levelColors[path.level]} rounded-3xl p-8 text-white mb-8`}>
+            <div className={`bg - gradient - to - r ${levelColors[path.level]} rounded - 3xl p - 8 text - white mb - 8`}>
                 <button
                     onClick={onBack}
                     className="flex items-center space-x-2 text-white/80 hover:text-white mb-6 transition-colors"
@@ -224,7 +224,9 @@ const PathDetail: React.FC<PathDetailProps> = ({ path, onBack }) => {
                 </button>
                 <div className="flex items-start justify-between">
                     <div>
-                        <div className="text-5xl mb-4">{path.domainIcon}</div>
+                        <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-4">
+                            <BookOpen size={32} className="text-white" />
+                        </div>
                         <h1 className="text-3xl font-black mb-2">{path.title}</h1>
                         <p className="text-white/80">{path.description}</p>
                     </div>
@@ -258,7 +260,7 @@ const PathDetail: React.FC<PathDetailProps> = ({ path, onBack }) => {
                             className="w-full p-6 flex items-center justify-between text-left hover:bg-gray-50 transition-all"
                         >
                             <div className="flex items-center space-x-4">
-                                <div className={`w-10 h-10 rounded-xl bg-gradient-to-r ${levelColors[path.level]} flex items-center justify-center text-white font-bold`}>
+                                <div className={`w - 10 h - 10 rounded - xl bg - gradient - to - r ${levelColors[path.level]} flex items - center justify - center text - white font - bold`}>
                                     {index + 1}
                                 </div>
                                 <div>
@@ -270,7 +272,7 @@ const PathDetail: React.FC<PathDetailProps> = ({ path, onBack }) => {
                                 <span className="text-sm text-gray-400">{course.resources.length} resources</span>
                                 <ChevronRight
                                     size={20}
-                                    className={`text-gray-400 transition-transform ${expandedCourse === course.id ? 'rotate-90' : ''}`}
+                                    className={`text - gray - 400 transition - transform ${expandedCourse === course.id ? 'rotate-90' : ''} `}
                                 />
                             </div>
                         </button>
@@ -378,13 +380,21 @@ export const LearningPathsPage: React.FC = () => {
                         {user && (
                             <button
                                 onClick={() => setShowUserPaths(!showUserPaths)}
-                                className={`flex items-center space-x-2 px-5 py-2.5 rounded-xl font-bold transition-all ${showUserPaths
-                                    ? 'bg-purple-600 text-white shadow-lg'
-                                    : 'bg-white text-purple-600 border-2 border-purple-600 hover:bg-purple-50'
+                                className={`group flex items-center space-x-2 px-5 py-2.5 rounded-xl font-bold transition-all duration-300 ${showUserPaths
+                                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-xl shadow-purple-200 scale-105'
+                                    : 'bg-gradient-to-r from-purple-50 to-indigo-50 text-purple-700 border-2 border-purple-200 hover:border-purple-400 hover:shadow-lg hover:shadow-purple-100 hover:scale-105'
                                     }`}
                             >
-                                <User size={18} />
+                                <User size={18} className={showUserPaths ? 'text-white' : 'text-purple-600 group-hover:text-purple-700'} />
                                 <span>Your Learning Paths</span>
+                                {userCurricula.length > 0 && (
+                                    <span className={`ml-1 px-2 py-0.5 text-xs rounded-full font-black ${showUserPaths
+                                        ? 'bg-white/20 text-white'
+                                        : 'bg-purple-200 text-purple-700'
+                                        }`}>
+                                        {userCurricula.length}
+                                    </span>
+                                )}
                             </button>
                         )}
                     </div>
@@ -424,7 +434,7 @@ export const LearningPathsPage: React.FC = () => {
                                     <div
                                         key={curriculum.id}
                                         className="group bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-5 border border-purple-100 hover:shadow-lg transition-all cursor-pointer"
-                                        onClick={() => navigate(`/curriculum/${curriculum.id}`)}
+                                        onClick={() => navigate(`/ curriculum / ${curriculum.id} `)}
                                     >
                                         <div className="flex items-start justify-between mb-3">
                                             <div className="p-2 bg-purple-100 rounded-xl">
@@ -474,7 +484,7 @@ export const LearningPathsPage: React.FC = () => {
                                 : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
                                 }`}
                         >
-                            {cat.icon} {cat.label}
+                            {cat.label}
                         </button>
                     ))}
                 </div>
@@ -501,7 +511,7 @@ export const LearningPathsPage: React.FC = () => {
                                     : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
                                     }`}
                             >
-                                {domain.icon} {domain.label}
+                                {domain.label}
                             </button>
                         ))}
                     </div>
@@ -519,7 +529,7 @@ export const LearningPathsPage: React.FC = () => {
                                     : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
                                     }`}
                             >
-                                {level.icon} {level.label}
+                                {level.label}
                             </button>
                         ))}
                     </div>

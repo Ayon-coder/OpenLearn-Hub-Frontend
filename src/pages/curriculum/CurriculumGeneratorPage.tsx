@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import {
     BookOpen, Target, Clock, Brain, Sparkles,
     ChevronRight, Loader2, AlertCircle, Plus, X,
-    GraduationCap, Code, Layers, Lightbulb
+    GraduationCap, Code, Layers, Lightbulb, Video, MonitorSmartphone,
+    FileText, Crosshair, Check
 } from 'lucide-react';
 import { authService } from '@/services/auth/authService';
 import { curriculumService, defaultFormData, CurriculumFormData } from '@/services/curriculum/curriculumService';
@@ -18,17 +19,17 @@ const FOCUS_AREA_SUGGESTIONS: Record<string, string[]> = {
 };
 
 const TIME_COMMITMENTS = [
-    { value: 'Less than 5 hours/week', label: '< 5 hours/week', icon: '🕐' },
-    { value: '5-10 hours/week', label: '5-10 hours/week', icon: '⏰' },
-    { value: '10-20 hours/week', label: '10-20 hours/week', icon: '📚' },
-    { value: 'More than 20 hours/week', label: '20+ hours/week', icon: '🚀' }
+    { value: 'Less than 5 hours/week', label: '< 5 hours/week', icon: Clock },
+    { value: '5-10 hours/week', label: '5-10 hours/week', icon: Clock },
+    { value: '10-20 hours/week', label: '10-20 hours/week', icon: BookOpen },
+    { value: 'More than 20 hours/week', label: '20+ hours/week', icon: Sparkles }
 ];
 
 const LEARNING_STYLES = [
-    { value: 'video-heavy', label: 'Video Tutorials', icon: '🎥', description: 'Learn by watching explanations' },
-    { value: 'hands-on', label: 'Hands-On Projects', icon: '💻', description: 'Learn by building things' },
-    { value: 'reading', label: 'Reading & Docs', icon: '📖', description: 'Learn from documentation' },
-    { value: 'mixed', label: 'Mixed Approach', icon: '🎯', description: 'Balanced learning style' }
+    { value: 'video-heavy', label: 'Video Tutorials', icon: Video, description: 'Learn by watching explanations' },
+    { value: 'hands-on', label: 'Hands-On Projects', icon: MonitorSmartphone, description: 'Learn by building things' },
+    { value: 'reading', label: 'Reading & Docs', icon: FileText, description: 'Learn from documentation' },
+    { value: 'mixed', label: 'Mixed Approach', icon: Crosshair, description: 'Balanced learning style' }
 ];
 
 export const CurriculumGeneratorPage: React.FC = () => {
@@ -152,7 +153,7 @@ export const CurriculumGeneratorPage: React.FC = () => {
                                             : 'bg-gray-100 text-gray-400'
                                         }`}
                                 >
-                                    {step > s ? '✓' : s}
+                                    {step > s ? <Check size={14} /> : s}
                                 </button>
                                 {s < 4 && <div className={`w-12 h-1 rounded ${step > s ? 'bg-green-300' : 'bg-gray-200'}`} />}
                             </React.Fragment>
@@ -322,7 +323,7 @@ export const CurriculumGeneratorPage: React.FC = () => {
                                                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                                     }`}
                                             >
-                                                <span className="text-xl">{option.icon}</span>
+                                                <option.icon size={20} className="flex-shrink-0" />
                                                 <span>{option.label}</span>
                                             </button>
                                         ))}
@@ -344,7 +345,7 @@ export const CurriculumGeneratorPage: React.FC = () => {
                                                     }`}
                                             >
                                                 <div className="flex items-center space-x-3 mb-1">
-                                                    <span className="text-xl">{style.icon}</span>
+                                                    <style.icon size={20} className="flex-shrink-0" />
                                                     <span>{style.label}</span>
                                                 </div>
                                                 <p className={`text-xs ${formData.learning_style === style.value ? 'text-orange-100' : 'text-gray-400'}`}>

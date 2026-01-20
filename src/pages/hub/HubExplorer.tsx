@@ -14,7 +14,9 @@ import {
   ArrowUpRight,
   TrendingUp,
   Lock,
-  Info
+  Info,
+  Medal,
+  Lightbulb
 } from 'lucide-react';
 import { INITIAL_SUBJECTS } from '@/constants';
 import { AuthRequiredModal } from '@/components/modals/AuthRequiredModal';
@@ -122,13 +124,13 @@ export const HubExplorer: React.FC = () => {
             <div className="flex items-start space-x-3">
               <Info className="text-orange-600 flex-shrink-0 mt-1" size={24} />
               <div>
-                <h3 className="font-black text-orange-900 mb-2">🥉 Bronze Level - Build Your Trust to Contribute</h3>
+                <h3 className="font-black text-orange-900 mb-2 flex items-center gap-2"><Medal size={18} className="text-orange-600" /> Bronze Level - Build Your Trust to Contribute</h3>
                 <p className="text-sm text-orange-800 font-medium mb-2">
                   You're currently at Bronze level (Trust Score: {user?.communityMetrics?.trustScore || 0}/100).
                   To unlock contributions, reach Silver level (40+ trust score) by engaging with the community.
                 </p>
-                <p className="text-xs text-orange-700 font-bold">
-                  💡 Browse notes, comment, and receive upvotes to increase your trust score!
+                <p className="text-xs text-orange-700 font-bold flex items-center gap-1">
+                  <Lightbulb size={14} /> Browse notes, comment, and receive upvotes to increase your trust score!
                 </p>
               </div>
             </div>

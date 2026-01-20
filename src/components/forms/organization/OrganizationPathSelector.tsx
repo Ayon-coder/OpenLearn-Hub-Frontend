@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, GraduationCap, Youtube } from 'lucide-react';
+import { BookOpen, GraduationCap, Youtube, Check, Lightbulb } from 'lucide-react';
 import { OrganizationPath } from '@/types';
 
 interface OrganizationPathSelectorProps {
@@ -59,8 +59,8 @@ export const OrganizationPathSelector: React.FC<OrganizationPathSelectorProps> =
                             key={path.id}
                             onClick={() => onSelectPath(path.id)}
                             className={`p-6 rounded-2xl border-2 transition-all text-left ${isSelected
-                                    ? `border-${path.color}-500 bg-${path.color}-50 ring-4 ring-${path.color}-100 scale-105`
-                                    : 'border-gray-200 hover:border-gray-300 bg-white hover:shadow-lg'
+                                ? `border-${path.color}-500 bg-${path.color}-50 ring-4 ring-${path.color}-100 scale-105`
+                                : 'border-gray-200 hover:border-gray-300 bg-white hover:shadow-lg'
                                 }`}
                         >
                             <div className="flex items-center space-x-3 mb-4">
@@ -71,7 +71,7 @@ export const OrganizationPathSelector: React.FC<OrganizationPathSelectorProps> =
                                 <div>
                                     <h4 className="font-black text-gray-900">{path.title}</h4>
                                     {isSelected && (
-                                        <span className="text-xs font-bold text-green-600">✓ Selected</span>
+                                        <span className="text-xs font-bold text-green-600 flex items-center gap-1"><Check size={12} /> Selected</span>
                                     )}
                                 </div>
                             </div>
@@ -91,9 +91,9 @@ export const OrganizationPathSelector: React.FC<OrganizationPathSelectorProps> =
 
             {/* Info */}
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                <p className="text-xs text-amber-800 font-medium">
-                    💡 <strong>Tip:</strong> Choose the path that best matches your content source.
-                    You can add additional organization paths in the preview step.
+                <p className="text-xs text-amber-800 font-medium flex items-start gap-1">
+                    <Lightbulb size={12} className="flex-shrink-0 mt-0.5" /> <span><strong>Tip:</strong> Choose the path that best matches your content source.
+                        You can add additional organization paths in the preview step.</span>
                 </p>
             </div>
         </div>

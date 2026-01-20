@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Upload, ArrowLeft } from 'lucide-react';
+import { Upload, ArrowLeft, Medal, Lightbulb } from 'lucide-react';
 import { authService } from '@/services/auth/authService';
 import { UploadTypeSelector } from '@/components/forms/organization/UploadTypeSelector';
 import { CourseUploadForm } from '@/components/forms/upload/CourseUploadForm';
@@ -40,7 +40,7 @@ export const NoteUploadPage: React.FC = () => {
                                     <Upload size={32} />
                                 </div>
                                 <div>
-                                    <h1 className="text-3xl font-black">🥉 Bronze Level</h1>
+                                    <h1 className="text-3xl font-black flex items-center gap-2"><Medal size={24} /> Bronze Level</h1>
                                     <p className="text-orange-100 font-medium">Note uploads locked</p>
                                 </div>
                             </div>
@@ -77,7 +77,7 @@ export const NoteUploadPage: React.FC = () => {
 
                             <div className="bg-gray-900 rounded-2xl p-4 mb-6 text-white">
                                 <div className="flex items-start space-x-3">
-                                    <span className="text-2xl">💡</span>
+                                    <Lightbulb size={24} />
                                     <div>
                                         <p className="text-sm font-medium text-gray-300">
                                             Your current trust score: <span className="font-black text-white">{user.communityMetrics?.trustScore || 0}</span>/100
