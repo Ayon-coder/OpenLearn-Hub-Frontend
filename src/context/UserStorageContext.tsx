@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { DemoContent } from '@/data/demoContents';
 import { Subscription } from '@/types';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
 export interface UserProfile {
     userId: string;
@@ -21,7 +21,6 @@ interface UserStorageContextType {
     isSaving: boolean;
     addToUploads: (content: DemoContent) => Promise<void>;
     updateSubscriptions: (newSubscriptions: Subscription[]) => Promise<void>;
-    dismissError: () => void;
     refreshProfile: () => Promise<void>;
 }
 
@@ -34,16 +33,14 @@ export const UserStorageProvider: React.FC<{ children: React.ReactNode }> = ({ c
     const [error, setError] = useState<string | null>(null);
     const [isSaving, setIsSaving] = useState(false);
 
-    const dismissError = () => setError(null);
-
     const fetchUserProfile = async () => {
-        if (!user || !user.id) {
+        if (!user || (!user.uid && !user.id)) {
             setLoading(false);
             setProfile(null);
             return;
         }
 
-        const userId = user.id;
+        const userId = user.uid || user.id;
         setLoading(true);
         try {
             const response = await axios.get(`${API_BASE_URL}/api/storage/user/${userId}`);
@@ -66,7 +63,7 @@ export const UserStorageProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
     const saveProfile = async (newProfile: UserProfile) => {
         if (!user) return;
-        const userId = user.id;
+        const userId = user.uid || user.id;
 
         setIsSaving(true);
         try {
@@ -130,7 +127,6 @@ export const UserStorageProvider: React.FC<{ children: React.ReactNode }> = ({ c
             isSaving,
             addToUploads,
             updateSubscriptions,
-            dismissError,
             refreshProfile: fetchUserProfile
         }}>
             {children}

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { UserPlus, UserCheck, Loader2 } from 'lucide-react';
+import { UserPlus, UserCheck } from 'lucide-react';
 import { subscriptionService } from '@/services/user/subscriptionService';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserStorage } from '@/hooks/useUserStorage';
@@ -18,10 +17,9 @@ export const FollowButton: React.FC<FollowButtonProps> = ({
     variant = 'default',
     onFollowChange
 }) => {
-    const { profile, updateSubscriptions, loading: profileLoading } = useUserStorage();
-    const { user } = useAuth();
+    const { profile, updateSubscriptions } = useUserStorage();
+    const { user } = useAuth(); // We still need user for auth check
     const [isLoading, setIsLoading] = useState(false);
-    const navigate = useNavigate();
 
     // Derive isFollowing from profile
     const isFollowing = React.useMemo(() => {
@@ -33,14 +31,12 @@ export const FollowButton: React.FC<FollowButtonProps> = ({
         e.stopPropagation();
 
         if (!user) {
-            navigate('/login');
+            // Redirect to login if not authenticated
+            window.location.hash = '/login';
             return;
         }
 
-        if (profileLoading || !profile) {
-            // Profile still loading, show loading feedback
-            return;
-        }
+        if (!profile) return;
 
         setIsLoading(true);
 
@@ -61,23 +57,11 @@ export const FollowButton: React.FC<FollowButtonProps> = ({
             await updateSubscriptions(newSubscriptions);
         } catch (error) {
             console.error("Failed to update subscription", error);
+            // Ideally revert UI state or show toast
         } finally {
             setIsLoading(false);
         }
     };
-
-    // If profile is loading, show loading state
-    if (user && (profileLoading || !profile)) {
-        return (
-            <button
-                disabled
-                className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-bold text-sm bg-gray-50 text-gray-400 cursor-wait`}
-            >
-                <Loader2 size={16} className="animate-spin" />
-                <span>Loading...</span>
-            </button>
-        );
-    }
 
     if (variant === 'compact') {
         return (

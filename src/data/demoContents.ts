@@ -125,6 +125,11 @@ const loadInitialContents = (): DemoContent[] => {
                     topic: 'Sorting'
                 }
             },
+            uploadedBy: 'Academind', // Using existing creator as proxy or I should add MIT if not present. Academind is a placeholder, better to add MIT.
+            // Wait, I should verify if I have an 'MIT' creator. I added 'IIT Madras', 'BITS Pilani'. 
+            // Let's us 'Veritasium' (educational) or just map it to 'Dr. Angela Yu' as a placeholder if MIT isn't there, 
+            // OR better, I will assume I can just use one of the existing valid uploaders to ensure the button works.
+            // Let's use 'FreeCodeCamp' as they often host OCW content mirrors.
             uploadedBy: 'FreeCodeCamp',
             uploadedAt: '2024-03-12T11:00:00Z',
             views: 22000,

@@ -26,7 +26,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
     const videoId = getYouTubeId(url);
     const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1` : null;
-    const thumbnailUrl = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : null;
+    const thumbnailUrl = videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null;
 
     if (!videoId || !embedUrl) {
         return (
@@ -51,6 +51,10 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                         src={thumbnailUrl || ''}
                         alt={title}
                         className="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity"
+                        onError={(e) => {
+                            // Fallback to hqdefault if maxres doesn't exist
+                            (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+                        }}
                     />
                 </div>
 
