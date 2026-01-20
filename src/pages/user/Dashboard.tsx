@@ -155,7 +155,7 @@ export const Dashboard: React.FC = () => {
         .catch(err => console.error('Failed to load curricula', err))
         .finally(() => setLoadingCurricula(false));
     }
-  }, [user]);
+  }, [user?.id]);
 
   const handleRestrictedAction = (feature: string, path: string) => {
     if (!user) {
