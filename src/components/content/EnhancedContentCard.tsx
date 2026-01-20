@@ -118,12 +118,9 @@ export const EnhancedContentCard: React.FC<EnhancedContentCardProps> = ({
                             return (
                                 <div className="relative w-full h-full cursor-pointer" onClick={(e) => { e.stopPropagation(); window.open(content.videoUrl, '_blank'); }}>
                                     <img
-                                        src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
+                                        src={`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`}
                                         alt={title}
                                         className="w-full h-full object-cover opacity-80 group-hover:opacity-60 transition-opacity"
-                                        onError={(e) => {
-                                            (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-                                        }}
                                     />
                                     {/* Play overlay */}
                                     <div className="absolute inset-0 flex items-center justify-center">

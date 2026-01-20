@@ -23,7 +23,7 @@ import { ContentSourceForm } from '@/components/forms/content-source/ContentSour
 import { validateSourceRequirement } from '@/services/content/contentSourceValidator';
 import { RichTextEditor } from '@/components/editor/RichTextEditor';
 import { WatermarkInput, WatermarkConfig } from './WatermarkInput';
-import { addDemoContent } from '@/data/demoContents';
+import { useUserStorage } from '@/hooks/useUserStorage';
 
 interface UploadWizardProps {
   onClose: () => void;
@@ -33,6 +33,7 @@ interface UploadWizardProps {
 
 export const UploadWizard: React.FC<UploadWizardProps> = ({ onClose, onComplete, initialData }) => {
   const user = authService.getUser();
+  const { addToUploads } = useUserStorage();
 
   // Check if community contributor has permission to upload
   if (user && user.role === 'community_contributor' && user.communityMetrics) {
@@ -319,7 +320,9 @@ export const UploadWizard: React.FC<UploadWizardProps> = ({ onClose, onComplete,
     });
 
     // Add to Trending page (DEMO_CONTENTS)
-    addDemoContent({
+    // Add to Persistent Storage (which syncs to GitHub)
+    // Note: We await this to ensure it's saved before closing
+    addToUploads({
       id: contentId,
       title: selection.title,
       description,
@@ -348,7 +351,7 @@ export const UploadWizard: React.FC<UploadWizardProps> = ({ onClose, onComplete,
       downloads: 0,
       videoUrl,
       coverImage: selection.attachedImage || undefined  // Use attached image as cover if no video
-    });
+    }).catch(err => console.error('Failed to sync upload:', err));
 
     onComplete(selection);
   };
