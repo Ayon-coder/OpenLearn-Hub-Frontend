@@ -273,11 +273,5 @@ vercel
 
 ## 📄 Related Links
 
-- **Backend Repository**: [OpenLearn-Hub Backend](../backend/README.md)
+- **Backend Repository**: 
 
----
-
-<div align="center">
-  <p>Made with ❤️ for OpenLearn Hub</p>
-  <p>© 2025 OpenLearn Hub. All rights reserved.</p>
-</div>
